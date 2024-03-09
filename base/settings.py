@@ -64,7 +64,7 @@ ROOT_URLCONF = 'base.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR/'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,21 +126,28 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR/'staticfiles'
+
+STATICFILES_DIRS = (BASE_DIR/'static',)
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+AUTH_USER_MODEL = "userauths.User"
 
 # Jazzmin
 
 JAZZMIN_SETTINGS = {
-    'site_header': "Facebook Clone",
-    'site_brand': "Connecting people together...",
+    'site_header': "Dostyq",
+    'site_brand': "Dos bolaiyq...",
     'site_logo': "images/logo.png",
-    'copyright':  "All Right Reserved 2023",
-    "welcome_sign": "Welcome to Facebook Clone, Login Now.",
+    'copyright':  "All Right Reserved 2024",
+    "welcome_sign": "Welcome to Dostyq Admin, Login Now.",
     "topmenu_links": [
         {"name": "Home",  "url": "admin:index",
             "permissions": ["auth.view_user"]},
