@@ -115,7 +115,6 @@ $(document).ready(function() {
                                 <img src="" alt="" class="w-6 h-6 rounded-full border-2 border-white dark:border-gray-900 -ml-2" />\
                                 <img src="" alt="" class="w-6 h-6 rounded-full border-2 border-white dark:border-gray-900 -ml-2" />\
                             </div>\
-                            <div class="dark:text-gray-100">Liked <strong> Johnson</strong> and <strong> 209 Others </strong></div>\
                         </div>\
                         <div class="border-t py-4 space-y-4 dark:border-gray-600">\
                             <div class="flex">\
@@ -169,11 +168,36 @@ $(document).ready(function() {
                     </div>\
                     '
 
-            $("#create-post-modal").removeClass("uk-flex uk-open")
-            $(".post-div").prepend(_html)
-        }
-        
-  
+                $("#create-post-modal").removeClass("uk-flex uk-open")
+                $(".post-div").prepend(_html)
+            }
+        })
     })
 })
+
+//Like post
+$(document).ready(function(){
+    $(document).on("click", "#like-btn", function(){
+        let btn_val = $(this).attr("data-like-btn")
+        console.log(btn_val);
+
+        $.ajax({
+            url:"/like-post/",
+            dataType: "json",
+            data:{
+                "id": btn_val
+            },
+            success: function(response){
+                if(response.data.bool === true){
+                    $("#like-count"+btn_val).text(response.data.likes)
+                    $(".like-btn"+btn_val).addClass("text-blue-500")
+                    $(".like-btn"+btn_val).removeClass("text-black")
+                } else {
+                    $("#like-count"+btn_val).text(response.data.likes)
+                    $(".like-btn"+btn_val).addClass("text-black")
+                    $(".like-btn"+btn_val).removeClass("text-blue-500")
+                }
+            }
+        })
+    })
 })

@@ -140,6 +140,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "userauths.User"
 
+LOGIN_REDIRECT_URL = "core:feed"
+LOGOUT_REDIRECT_URL = "userauths:sign-up"
+LOGIN_URL = "userauths:sign-up"
+
 # Jazzmin
 
 JAZZMIN_SETTINGS = {

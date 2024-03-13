@@ -8,5 +8,6 @@ urlpatterns = [
     path('', views.index, name='feed'),
 
     # Ajax URLs
-    path('create-post/', views.create_post, name='create-post')
+    path('create-post/', views.create_post, name='create-post'),
+    path('like-post/', views.like_post, name='like-post'),
 ]

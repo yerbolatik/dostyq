@@ -1,7 +1,8 @@
-from django.http import JsonResponse
 import shortuuid
 
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
 from django.utils.text import slugify
 from django.utils.timesince import timesince
 from django.views.decorators.csrf import csrf_exempt
@@ -9,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from core.models import Post
 
 
+@login_required
 def index(request):
     posts = Post.objects.filter(
         active=True, visibility="Everyone").order_by("-id")
@@ -53,4 +55,22 @@ def create_post(request):
 
     return JsonResponse({"data": "sent"})
 
-# def like_post(request):
+
+def like_post(request):
+    id = request.GET['id']
+    post = Post.objects.get(id=id)
+    user = request.user
+    bool = False
+
+    if user in post.likes.all():
+        post.likes.remove(user)
+        bool = False
+    else:
+        post.likes.add(user)
+        bool = True
+
+    data = {
+        "bool": bool,
+        "likes": post.likes.all().count()
+    }
+    return JsonResponse({"data": data})
