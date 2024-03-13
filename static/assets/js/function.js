@@ -173,31 +173,105 @@ $(document).ready(function() {
             }
         })
     })
-})
 
-//Like post
-$(document).ready(function(){
-    $(document).on("click", "#like-btn", function(){
-        let btn_val = $(this).attr("data-like-btn")
-        console.log(btn_val);
+
+    //Like post
+    $(document).ready(function(){
+        $(document).on("click", "#like-btn", function(){
+            let btn_val = $(this).attr("data-like-btn")
+            console.log(btn_val);
+
+            $.ajax({
+                url:"/like-post/",
+                dataType: "json",
+                data:{
+                    "id": btn_val
+                },
+                success: function(response){
+                    if(response.data.bool === true){
+                        $("#like-count"+btn_val).text(response.data.likes)
+                        $(".like-btn"+btn_val).addClass("text-blue-500")
+                        $(".like-btn"+btn_val).removeClass("text-black")
+                    } else {
+                        $("#like-count"+btn_val).text(response.data.likes)
+                        $(".like-btn"+btn_val).addClass("text-black")
+                        $(".like-btn"+btn_val).removeClass("text-blue-500")
+                    }
+                }
+            })
+        })
+    })
+
+
+    // Comment on Post
+    $(document).on("click", "#comment-btn", function(){
+        let id = $(this).attr("data-comment-btn")
+        let comment = $("#comment-input"+id).val()
+        console.log(id);
+        console.log(comment);
 
         $.ajax({
-            url:"/like-post/",
-            dataType: "json",
+            url:"/comment-post/",
+            dataType:"json",
             data:{
-                "id": btn_val
+                "id": id,
+                "comment": comment,
             },
             success: function(response){
-                if(response.data.bool === true){
-                    $("#like-count"+btn_val).text(response.data.likes)
-                    $(".like-btn"+btn_val).addClass("text-blue-500")
-                    $(".like-btn"+btn_val).removeClass("text-black")
-                } else {
-                    $("#like-count"+btn_val).text(response.data.likes)
-                    $(".like-btn"+btn_val).addClass("text-black")
-                    $(".like-btn"+btn_val).removeClass("text-blue-500")
-                }
+                console.log(response);
+                let newComment = '<div class="flex card shadow p-2">\
+                    <div class="w-10 h-10 rounded-full relative flex-shrink-0">\
+                        <img src="'+ response.data.profile_image +'" alt="" class="absolute h-full rounded-full w-full">\
+                    </div>\
+                    <div>\
+                        <div class="text-gray-700 py-2 px-3 rounded-md bg-gray-100 relative lg:ml-5 ml-2 lg:mr-12  dark:bg-gray-800 dark:text-gray-100">\
+                            <p class="leading-6">'+ response.data.comment +'</p>\
+                            <div class="absolute w-3 h-3 top-3 -left-1 bg-gray-100 transform rotate-45 dark:bg-gray-800"></div>\
+                        </div>\
+                        <div class="text-sm flex items-center space-x-3 mt-2 ml-5">\
+                                <a id="like-comment-btn" data-like-comment="'+ response.data.comment_id +'" class="like-comment'+ response.data.comment_id +'" style="color:black; cursor: pointer;"><i class="fa-regular fa-heart"></i></a> <small><span id="comment-likes-count'+ response.data.comment_id +'">0</span></small>\
+                            <a href="#"> Reply </a>\
+                            <span><small> '+ response.data.date +' ago</small></span>\
+                        </div>\
+                    </div>\
+                </div>\
+                '
+                $("#comment-div"+id).prepend(newComment)
+                $("#comment-input"+id).val("")
+                $("#comment-count"+id).text(response.data.comment_count)
             }
         })
     })
+
+    
+    // Like Comment
+    $(document).on("click", "#like-comment-btn", function(){
+        let id = $(this).attr("data-like-comment")
+            console.log("Comment ID:",id);
+
+
+        let iconElement = $(this).find("i");
+
+        $.ajax({
+            url:"/like-comment/",
+            dataType:"json",
+            data:{
+                "id": id,
+            },
+            success: function(response){
+                console.log(response);
+
+                if(response.data.bool === true){
+                    $("#comment-likes-count"+id).html(response.data.likes);
+                    iconElement.removeClass("far").addClass("fas").css("color", "red"); // Изменяем классы иконки на fas
+                } else {
+                    $("#comment-likes-count"+id).text(response.data.likes);
+                    iconElement.removeClass("fas").addClass("far").css("color", "black"); // Изменяем классы иконки на far
+                }
+
+            }
+
+        })
+    })
+
 })
