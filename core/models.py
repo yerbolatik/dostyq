@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Count
 from django.utils.html import mark_safe
 from django.utils.text import slugify
 from userauths.models import User, Profile, user_directory_path
@@ -76,7 +77,7 @@ class Gallery(models.Model):
     active = models.BooleanField(default=True)
     date = models.DateTimeField(auto_now_add=True)
 
-    def __srt__(self):
+    def __str__(self):
         return str(self.post)
 
     class Meta:
@@ -97,7 +98,7 @@ class FriendRequest(models.Model):
         max_length=100, default="pending", choices=FRIEND_REQUEST)
     date = models.DateTimeField(auto_now_add=True)
 
-    def __srt__(self):
+    def __str__(self):
         return str(self.sender)
 
     class Meta:
@@ -113,7 +114,7 @@ class Friend(models.Model):
         User, on_delete=models.CASCADE, related_name="friend")
     date = models.DateTimeField(auto_now_add=True)
 
-    def __srt__(self):
+    def __str__(self):
         return str(self.user)
 
     class Meta:
@@ -132,11 +133,25 @@ class Comment(models.Model):
     cid = ShortUUIDField(length=7, max_length=25,
                          alphabet='abcdefghijklmnopqrstuvwxyz')
 
-    def __srt__(self):
+    def __str__(self):
         return str(self.post)
 
     class Meta:
+        ordering = ["date"]
         verbose_name_plural = 'Comment'
+
+    def comment_replies(self):
+        comment_replies = ReplyComment.objects.filter(
+            comment=self, active=True)
+        return comment_replies
+
+    @property
+    def likes_count(self):
+        return self.likes.count()
+
+    @classmethod
+    def with_likes_count(cls):
+        return cls.objects.annotate(likes_count=Count('likes')).order_by('-likes_count')
 
 
 class ReplyComment(models.Model):
@@ -149,10 +164,11 @@ class ReplyComment(models.Model):
     cid = ShortUUIDField(length=7, max_length=25,
                          alphabet='abcdefghijklmnopqrstuvwxyz')
 
-    def __srt__(self):
+    def __str__(self):
         return str(self.comment)
 
     class Meta:
+        ordering = ["-date"]
         verbose_name_plural = 'Reply Comment'
 
 
@@ -172,7 +188,7 @@ class Notification(models.Model):
     nid = ShortUUIDField(length=7, max_length=25,
                          alphabet='abcdefghijklmnopqrstuvwxyz')
 
-    def __srt__(self):
+    def __str__(self):
         return str(self.user)
 
     class Meta:

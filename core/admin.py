@@ -47,7 +47,7 @@ class CommentAdmin(admin.ModelAdmin):
 
 class ReplyAdmin(admin.ModelAdmin):
     # inlines = [ReplyCommentTabAdmin]
-    list_display = ['user', 'comment', 'active']
+    list_display = ['user', 'comment', 'reply', 'active']
 
 
 class NotificationAdmin(admin.ModelAdmin):

@@ -8,7 +8,7 @@ from django.utils.timesince import timesince
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
 
-from core.models import Post, Comment
+from core.models import Post, Comment, ReplyComment
 
 
 @login_required
@@ -119,5 +119,52 @@ def like_comment(request):
     data = {
         "bool": bool,
         "likes": comment.likes.all().count()
+    }
+    return JsonResponse({"data": data})
+
+
+def reply_comment(request):
+    id = request.GET['id']
+    reply = request.GET['reply']
+
+    comment = Comment.objects.get(id=id)
+    user = request.user
+
+    new_reply = ReplyComment.objects.create(
+        reply=reply,
+        comment=comment,
+        user=user,
+    )
+
+    data = {
+        "bool": True,
+        "reply": new_reply.reply,
+        "profile_image": new_reply.user.profile.image.url,
+        "date": timesince(new_reply.date),
+        "reply_id": new_reply.id,
+        "post_id": new_reply.comment.post.id,
+    }
+
+    return JsonResponse({"data": data})
+
+
+def delete_comment(request):
+    id = request.GET['id']
+    comment = Comment.objects.get(id=id)
+    comment.delete()
+
+    data = {
+        "bool": True
+    }
+    return JsonResponse({"data": data})
+
+
+def delete_reply(request):
+    id = request.GET['id']
+    reply = ReplyComment.objects.get(id=id)
+    reply.delete()
+
+    data = {
+        "bool": True
     }
     return JsonResponse({"data": data})
