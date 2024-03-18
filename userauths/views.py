@@ -2,7 +2,9 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
+from core.models import Post, FriendRequest
 from userauths.forms import UserRegisterForm
 from userauths.models import Profile, User
 
@@ -68,3 +70,44 @@ def LogoutView(request):
     logout(request)
     messages.success(request, "You are logged out!")
     return redirect("userauths:sign-up")
+
+
+@login_required
+def my_profile(request):
+    profile = request.user.profile
+    posts = Post.objects.filter(active=True, user=request.user).order_by("-id")
+
+    context = {
+        "profile": profile,
+        "posts": posts
+    }
+    return render(request, "userauths/my-profile.html", context)
+
+
+@login_required
+def friend_profile(request, username):
+    profile = Profile.objects.get(user__username=username)
+    posts = Post.objects.filter(active=True, user=profile.user).order_by("-id")
+
+    bool = False
+    bool_friend = False
+
+    sender = request.user
+    receiver = profile.user
+
+    try:
+        friend_request = FriendRequest.objects.filter(
+            sender=sender, receiver=receiver)
+        if friend_request:
+            bool = True
+        else:
+            bool = False
+    except:
+        bool = False
+
+    context = {
+        "profile": profile,
+        "posts": posts,
+        "bool": bool,
+    }
+    return render(request, "userauths/friend-profile.html", context)

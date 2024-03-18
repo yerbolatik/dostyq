@@ -8,7 +8,8 @@ from django.utils.timesince import timesince
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
 
-from core.models import Post, Comment, ReplyComment
+from core.models import Post, Comment, ReplyComment, Friend, FriendRequest
+from userauths.models import User
 
 
 @login_required
@@ -19,6 +20,15 @@ def index(request):
         "posts": posts
     }
     return render(request, 'core/index.html', context)
+
+
+@login_required
+def post_detail(request, slug):
+    post = Post.objects.get(slug=slug, active=True, visibility="Everyone")
+    context = {
+        "post": post
+    }
+    return render(request, 'core/post_detail.html', context)
 
 
 @csrf_exempt
@@ -168,3 +178,27 @@ def delete_reply(request):
         "bool": True
     }
     return JsonResponse({"data": data})
+
+
+def add_friend(request):
+    sender = request.user
+    receiver_id = request.GET['id']
+    bool = False
+
+    if sender.id == int(receiver_id):
+        return JsonResponse({"error": "You cannot send a friend request to yourself"})
+
+    receiver = User.objects.get(id=receiver_id)
+
+    try:
+        friend_request = FriendRequest.objects.get(
+            sender=sender, receiver=receiver)
+        if friend_request:
+            friend_request.delete()
+        bool = False
+        return JsonResponse({"error": "Cancelled", "bool": bool})
+    except friend_request.DoesNotExist:
+        friend_request = FriendRequest(sender=sender, receiver=receiver)
+        friend_request.save()
+        bool = True
+        return JsonResponse({"success": "Sent", "bool": bool})

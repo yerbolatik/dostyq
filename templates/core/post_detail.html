@@ -10,6 +10,18 @@
     summary::marker {
     content: ""; /* Hide the pseudo-element */
     }
+
+    ::-webkit-scrollbar{
+        width: 2px;
+    }
+
+    ::-webkit-scrollbar-track{
+        background-color: #ededed; 
+    }
+    
+    ::-webkit-scrollbar-thumb{
+        background-color: #b7b7b7; 
+    }
 </style>
     <!-- Main Contents -->
     <div class="main_content">
@@ -95,17 +107,16 @@
 
                     <!-- post div-->
                     <div class="post-div">
-                        {% for post in posts %}
                         <div class="card lg:mx-0 uk-animation-slide-bottom-small mt-3 mb-3">
 
                             <!-- post header-->
                             <div class="flex justify-between items-center lg:p-4 p-2.5">
                                 <div class="flex flex-1 items-center space-x-4">
-                                    <a href="{% url "userauths:profile" post.user %}">
+                                    <a href="#">
                                         <img src="{{ post.user.profile.image.url }}" class="bg-gray-200 border border-white rounded-full w-10 h-10">
                                     </a>
                                     <div class="flex-1 font-semibold capitalize">
-                                        <a href="{% url "userauths:profile" post.user %}" class="text-black dark:text-gray-100"> {{ post.user.profile.full_name }} </a>
+                                        <a href="#" class="text-black dark:text-gray-100"> {{ post.user }} </a>
                                         <div class="text-gray-700 flex items-center space-x-2"><span><small>{{ post.date|timesince}} ago </span>
                                             <ion-icon name="time-outline"></ion-icon></small>
                                         </div>
@@ -196,7 +207,7 @@
 
                                     {% if post.likes.all.count > 0 %}
                                         <div class="flex items-center">
-                                            {% for icon in post.likes.all|slice:"3" %}
+                                            {% for icon in post.likes.all %}
                                                 {% if forloop.first %}
                                                     <img src="{{ icon.profile.image.url }}" alt="" class="w-6 h-6 rounded-full border-2 border-white dark:border-gray-900">
                                                 {% else %}
@@ -216,7 +227,7 @@
 
                                 <div class="border-t py-4 space-y-4 dark:border-gray-600" id="comment-div{{ post.id }}">
 
-                                    {% for comment in post.post_comments|slice:"2" %}
+                                    {% for comment in post.post_comments %}
                                         <div class="flex card shadow p-2" id="comment-div{{ comment.id }}">
                                             <div class="w-10 h-10 rounded-full relative flex-shrink-0">
                                                 <img src="{{ comment.user.profile.image.url }}" alt="" class="absolute h-full rounded-full w-full">
@@ -262,8 +273,8 @@
                                                 
 
                                                     <!-- Comment Replies -->
-                                                    <div class="reply-div{{ comment.id }}">
-                                                        {% for comment in comment.comment_replies|slice:"1" %}
+                                                    <div class="reply-div{{ comment.id }}" style="overflow-y:auto; max-height: 200px">
+                                                        {% for comment in comment.comment_replies %}
                                                             <div class="flex mr-12 mb-2 mt-2" style="margin-right: 20px;" id="reply-div{{ comment.id }}">
                                                                 <div class="w-10 h-10 rounded-full relative flex-shrink-0">
                                                                     <img src="{{request.user.profile.image.url}}" style="width: 40px; height: 40px;" alt="" class="absolute h-full rounded-full w-full">
@@ -298,9 +309,6 @@
 
                                 </div>
 
-                                {% if post.post_comments.count > 0 %}
-                                    <a href="{% url "core:post-detail" post.slug %}" class="hover:text-blue-600 hover:underline view-all-comments" data-post-id="{{ post.id }}">  Veiw all {{ post.post_comments.count }} comments </a>
-                                {% endif %}
                                 <div class="bg-gray-100 rounded-full relative dark:bg-gray-800 border-t">
                                     <input placeholder="Add your Comment.." id="comment-input{{ post.id }}" data-comment-input="{{ post.id }}" class="bg-transparent max-h-10 shadow-none px-5 comment-input{{ post.id }}">
                                     <div class="-m-0.5 absolute bottom-0 flex items-center right-3 text-xl">
@@ -313,7 +321,6 @@
                             </div>
 
                         </div>
-                        {% endfor %}
                     </div>
                     <!-- post div end-->
 
