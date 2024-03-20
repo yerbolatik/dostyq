@@ -197,7 +197,7 @@ def add_friend(request):
             friend_request.delete()
         bool = False
         return JsonResponse({"error": "Cancelled", "bool": bool})
-    except friend_request.DoesNotExist:
+    except FriendRequest.DoesNotExist:
         friend_request = FriendRequest(sender=sender, receiver=receiver)
         friend_request.save()
         bool = True
