@@ -343,7 +343,7 @@ $(document).ready(function() {
     $(document).on("click", "#add-friend", function(){
 
         let id = $(this).attr("data-friend-id")
-        console.log("Added ID:" + id + " as Friend");
+        console.log("Added ID:" + id + " as a Friend");
 
         $.ajax({
             url: "/add-friend/",
@@ -368,6 +368,32 @@ $(document).ready(function() {
         })
 
     })
+
+
+    // Unfriend
+    $(document).on("click", "#unfriend", function(){
+
+        let id = $(this).attr("data-unfriend")
+        console.log("Removed ID:" + id + " as a Friend");
+
+        $.ajax({
+            url: "/unfriend/",
+            dataType: "json",
+            data: {
+                "id":id,
+            },
+            success: function(response){
+                console.log(response);
+                if(response.bool === true){
+                    $("#unfriend-text").html('<i class="fas fa-check-circle"></i> Friend Removed')
+                    $(".unfriend"+id).addClass("bg-green-600")
+                    $(".unfriend"+id).removeClass("bg-red-600")
+                }
+            }
+        })
+
+    })
+
 
     // Accept Friend Request
     $(document).on("click", "#accept-friend-request", function(){

@@ -204,6 +204,23 @@ def add_friend(request):
         return JsonResponse({"success": "Sent", "bool": bool})
 
 
+def unfriend(request):
+    sender = request.user
+    friend_id = request.GET['id']
+    bool = False
+
+    if sender.id == int(friend_id):
+        return JsonResponse({"error": "You cannot unfriend yourself"})
+
+    my_friend = User.objects.get(id=friend_id)
+
+    if my_friend in sender.profile.friends.all():
+        sender.profile.friends.remove(my_friend)
+        my_friend.profile.friends.remove(sender)
+        bool = True
+        return JsonResponse({"success": "Unfriend successfull.", "bool": bool})
+
+
 def accept_friend_request(request):
     id = request.GET['id']
 
