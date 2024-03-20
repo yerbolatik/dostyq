@@ -388,4 +388,25 @@ $(document).ready(function() {
             }
         })
     })
+    
+    
+    // Reject Friend Request
+    $(document).on("click", "#reject-friend-request", function(){
+        let id = $(this).attr("data-request-id")
+        console.log("Reject Friend ID:", id);
+
+        $.ajax({
+            url:"/reject-friend-request/",
+            dataType: "json",
+            data: {
+                "id":id
+            },
+            
+            success: function(response){
+                console.log(response);
+                $(".accept-friend-request-hide"+id).hide()
+                $(".reject-friend-request"+id).html('<i class="fas fa-check-circle"></i> Rejected')
+            }
+        })
+    })
 })
