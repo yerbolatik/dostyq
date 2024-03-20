@@ -322,4 +322,4 @@ def inbox(request):
     context = {
         "chat_message": chat_message,
     }
-    return render(request, "chat/inbox.html")
+    return render(request, "chat/inbox.html", context)
