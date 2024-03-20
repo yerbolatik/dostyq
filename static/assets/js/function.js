@@ -369,4 +369,23 @@ $(document).ready(function() {
 
     })
 
+    // Accept Friend Request
+    $(document).on("click", "#accept-friend-request", function(){
+        let id = $(this).attr("data-request-id")
+        console.log("New Friend ID:", id);
+
+        $.ajax({
+            url:"/accept-friend-request/",
+            dataType: "json",
+            data: {
+                "id":id
+            },
+            
+            success: function(response){
+                console.log(response);
+                $(".reject-friend-request-hide"+id).hide()
+                $(".accept-friend-request"+id).html('<i class="fas fa-check-circle"></i> Accepted')
+            }
+        })
+    })
 })
