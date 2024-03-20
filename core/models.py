@@ -91,9 +91,9 @@ class FriendRequest(models.Model):
     fid = ShortUUIDField(length=7, max_length=25,
                          alphabet='abcdefghijklmnopqrstuvwxyz')
     sender = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="sender")
+        User, on_delete=models.CASCADE, related_name="request_sender")
     receiver = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="receiver")
+        User, on_delete=models.CASCADE, related_name="request_receiver")
     status = models.CharField(
         max_length=100, default="pending", choices=FRIEND_REQUEST)
     date = models.DateTimeField(auto_now_add=True)
@@ -102,7 +102,8 @@ class FriendRequest(models.Model):
         return str(self.sender)
 
     class Meta:
-        verbose_name_plural = 'FriendRequest'
+        ordering = ["-date"]
+        verbose_name_plural = 'Friend Request'
 
 
 class Friend(models.Model):
@@ -118,6 +119,7 @@ class Friend(models.Model):
         return str(self.user)
 
     class Meta:
+        ordering = ["-date"]
         verbose_name_plural = 'Friend'
 
 
@@ -137,7 +139,7 @@ class Comment(models.Model):
         return str(self.post)
 
     class Meta:
-        ordering = ["date"]
+        ordering = ["-date"]
         verbose_name_plural = 'Comment'
 
     def comment_replies(self):
@@ -192,6 +194,7 @@ class Notification(models.Model):
         return str(self.user)
 
     class Meta:
+        ordering = ["-date"]
         verbose_name_plural = 'Notification'
 
 
@@ -262,6 +265,10 @@ class GroupPost(models.Model):
             return self.title
         else:
             return self.user.username
+
+    class Meta:
+        ordering = ["-date"]
+        verbose_name_plural = "Group Post"
 
     def save(self, *args, **kwargs):
         uuid_key = shortuuid.uuid()
@@ -343,6 +350,10 @@ class PagePost(models.Model):
         else:
             return self.user.username
 
+    class Meta:
+        ordering = ["-date"]
+        verbose_name_plural = "Page Post"
+
     def save(self, *args, **kwargs):
         uuid_key = shortuuid.uuid()
         uniqueid = uuid_key[:2]
@@ -353,3 +364,27 @@ class PagePost(models.Model):
 
     def thumbnail(self):
         return mark_safe('<img src="/media/%s" width="50" height="50" style="object-fit: cover; border-radius: 5px;" />' % (self.image))
+
+
+class ChatMessage(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL,
+                             null=True, blank=True, related_name="chat_user")
+    sender = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name="sender")
+    receiver = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name="receiver")
+    message = models.CharField(max_length=10000000000)
+    is_read = models.BooleanField(default=False)
+    date = models.DateTimeField(auto_now_add=True)
+    mid = ShortUUIDField(length=10, max_length=25,
+                         alphabet="abcdefghijklmnopqrstuvxyz")
+
+    def __str__(self):
+        return self.user.username
+
+    class Meta:
+        ordering = ["-date"]
+        verbose_name_plural = "Chat Message"
+
+    def thumbnail(self):
+        return mark_safe('<img src="/media/%s" width="50" height="50" object-fit:"cover" style="border-radius: 5px;" />' % (self.image))

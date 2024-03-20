@@ -491,7 +491,7 @@
             <div class="sidebar_inner" data-simplebar>
 
                 <ul>
-                    <li class="active"><a href="feed.html"> 
+                    <li class="active"><a href="{% url "core:feed" %}"> 
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="text-blue-600"> 
                             <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                         </svg>
@@ -587,32 +587,35 @@
 
                 <div class="contact-list my-2 ml-1">
 
-                    <a href="chats-friend.html">
+                    {% for friend in request.user.profile.friends.all %}
+
+                    <a href="#">
                         <div class="contact-avatar">
-                            <img src="{% static 'assets/images/avatars/avatar-1.jpg' %}" alt="">
+                            <img src="{{friend.profile.image.url}}" alt="">
                             <span class="user_status status_online"></span>
                         </div>
-                        <div class="contact-username"> Dennis Han</div>
+                        <div class="contact-username"> {{friend.profile.full_name}}</div>
                     </a>
-                    <a href="chats-friend.html">
-                        <div class="contact-avatar">
-                            <img src="{% static 'assets/images/avatars/avatar-2.jpg' %}" alt="">
-                            <span class="user_status"></span>
+                    <div uk-drop="pos: left-center ;animation: uk-animation-slide-left-small">
+                        <div class="contact-list-box">
+                            <div class="contact-avatar">
+                                <img src="{{f.profile.image.url}}" alt="">
+                                <span class="user_status status_online"></span>
+                            </div>
+                            <div class="contact-username">  {{friend.profile.full_name}}</div>
+                            <p>
+                                <ion-icon name="people" class="text-lg mr-1"></ion-icon> Become friends with
+                                <strong> Stella Johnson </strong> and <strong> 14 Others</strong>
+                            </p>
+                            <div class="contact-list-box-btns">
+                                {% comment %} <a href="{% url 'core:inbox_detail' friend.username %}" class="button primary flex-1 block mr-2"> <i class="uil-envelope mr-1"></i> Send message</a> {% endcomment %}
+                                <button type="button" href="#" class="button secondary button-icon mr-2"><i class="uil-list-ul"> </i> </button>
+                                <button type="button" a href="#" class="button secondary button-icon"> <i class="uil-ellipsis-h"> </i> </button>
+                            </div>
                         </div>
-                        <div class="contact-username"> Erica Jones</div>
-                    </a>
-                    <a href="chats-friend.html">
-                        <div class="contact-avatar">
-                            <img src="{% static 'assets/images/avatars/avatar-7.jpg' %}" alt="">
-                        </div>
-                        <div class="contact-username">Stella Johnson</div>
-                    </a>
-                    <a href="chats-friend.html">
-                        <div class="contact-avatar">
-                            <img src="{% static 'assets/images/avatars/avatar-4.jpg' %}" alt="">
-                        </div>
-                        <div class="contact-username"> Alex Dolgove</div>
-                    </a>
+                    </div>
+                    {% endfor %}
+
 
                 </div>
 

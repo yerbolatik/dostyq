@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from core.models import Post, Gallery, Friend, FriendRequest, Comment, ReplyComment, Notification, Group, GroupPost, Page, PagePost
+from core.models import Post, Gallery, Friend, FriendRequest, Comment, ReplyComment, Notification, Group, GroupPost, Page, PagePost, ChatMessage
 
 
 class GalleryAdminTab(admin.TabularInline):
@@ -67,6 +67,11 @@ class PageAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ('name',)}
 
 
+class ChatMessageAdmin(admin.ModelAdmin):
+    list_editable = ['message']
+    list_display = ['sender', 'receiver', 'message', 'is_read']
+
+
 admin.site.register(Post, PostAdmin)
 admin.site.register(Gallery, GalleryAdmin)
 admin.site.register(Friend, FriendAdmin)
@@ -78,3 +83,4 @@ admin.site.register(Group, GroupAdmin)
 admin.site.register(Page, PageAdmin)
 admin.site.register(GroupPost)
 admin.site.register(PagePost)
+admin.site.register(ChatMessage, ChatMessageAdmin)

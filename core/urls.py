@@ -8,6 +8,8 @@ urlpatterns = [
     path('', views.index, name='feed'),
     path('post/<slug:slug>/', views.post_detail, name='post-detail'),
 
+    path('core/inbox/', views.inbox, name='inbox'),
+
     # Ajax URLs
     path('create-post/', views.create_post, name='create-post'),
     path('like-post/', views.like_post, name='like-post'),

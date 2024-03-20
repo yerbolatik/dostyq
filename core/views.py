@@ -6,9 +6,9 @@ from django.shortcuts import redirect, render
 from django.utils.text import slugify
 from django.utils.timesince import timesince
 from django.views.decorators.csrf import csrf_exempt
-from django.template.loader import render_to_string
+from django.db.models import OuterRef, Subquery, Q
 
-from core.models import Post, Comment, ReplyComment, Friend, FriendRequest, Notification
+from core.models import Post, Comment, ReplyComment, Friend, FriendRequest, Notification, ChatMessage
 from userauths.models import User
 
 
@@ -298,3 +298,28 @@ def reject_friend_request(request):
         "bool": True,
     }
     return JsonResponse({"data": data})
+
+
+@login_required
+def inbox(request):
+    user_id = request.user
+    chat_message = ChatMessage.objects.filter(
+        id__in=Subquery(
+            User.objects.filter(
+                Q(sender__receiver=user_id) |
+                Q(receiver__sender=user_id)
+            ).distinct().annotate(
+                last_msg=Subquery(
+                    ChatMessage.objects.filter(
+                        Q(sender=OuterRef("id"), receiver=user_id) |
+                        Q(receiver=OuterRef("id"), sender=user_id)
+                    ).order_by("-id")[:1].values_list("id", flat=True)
+                )
+            ).values_list("last_msg", flat=True).order_by("-id")
+        )
+    ).order_by("-id")
+
+    context = {
+        "chat_message": chat_message,
+    }
+    return render(request, "chat/inbox.html")
