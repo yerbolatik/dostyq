@@ -8,8 +8,18 @@ from django.utils.timesince import timesince
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
 
-from core.models import Post, Comment, ReplyComment, Friend, FriendRequest
+from core.models import Post, Comment, ReplyComment, Friend, FriendRequest, Notification
 from userauths.models import User
+
+
+# Notification Keys
+noti_new_like = "New Like"
+noti_new_follower = "New Follower"
+noti_friend_request = "Friend Request"
+noti_new_comment = "New Comment"
+noti_comment_liked = "Comment Liked"
+noti_comment_replied = "Comment Replied"
+noti_friend_request_accepted = "Friend Request Accepted"
 
 
 @login_required
@@ -29,6 +39,17 @@ def post_detail(request, slug):
         "post": post
     }
     return render(request, 'core/post_detail.html', context)
+
+
+def send_notification(user, sender, post, comment, notification_type):
+    notification = Notification.objects.create(
+        user=user,
+        sender=sender,
+        post=post,
+        comment=comment,
+        notification_type=notification_type,
+    )
+    return notification
 
 
 @csrf_exempt
@@ -80,6 +101,9 @@ def like_post(request):
         post.likes.add(user)
         bool = True
 
+        if post.user != request.user:
+            send_notification(post.user, user, post, None, noti_new_like)
+
     data = {
         "bool": bool,
         "likes": post.likes.all().count()
@@ -99,6 +123,9 @@ def comment_on_post(request):
         comment=comment,
         user=user,
     )
+
+    if new_comment.user != post.user:
+        send_notification(post.user, user, post, new_comment, noti_new_comment)
 
     data = {
         "bool": True,
@@ -125,6 +152,10 @@ def like_comment(request):
     else:
         comment.likes.add(user)
         bool = True
+
+        if comment.user != user:
+            send_notification(comment.user, user, comment.post,
+                              comment, noti_comment_liked)
 
     data = {
         "bool": bool,
@@ -154,6 +185,10 @@ def reply_comment(request):
         "reply_id": new_reply.id,
         "post_id": new_reply.comment.post.id,
     }
+
+    if comment.user != user:
+        send_notification(comment.user, user, comment.post,
+                          comment, noti_comment_replied)
 
     return JsonResponse({"data": data})
 
@@ -201,6 +236,9 @@ def add_friend(request):
         friend_request = FriendRequest(sender=sender, receiver=receiver)
         friend_request.save()
         bool = True
+
+        send_notification(receiver, sender, None, None, noti_friend_request)
+
         return JsonResponse({"success": "Sent", "bool": bool})
 
 
@@ -234,6 +272,9 @@ def accept_friend_request(request):
     sender.profile.friends.add(receiver)
 
     friend_request.delete()
+
+    send_notification(sender, receiver, None, None,
+                      noti_friend_request_accepted)
 
     data = {
         "message": "Accepted",
