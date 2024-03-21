@@ -3,11 +3,16 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
 
+from core.routing import websocket_urlpatterns
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
     path('user/', include('userauths.urls')),
+
+    # Web Socket
+    path("ws/", include(websocket_urlpatterns)),
 ]
 
 if settings.DEBUG:

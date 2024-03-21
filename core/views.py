@@ -323,3 +323,48 @@ def inbox(request):
         "chat_message": chat_message,
     }
     return render(request, "chat/inbox.html", context)
+
+
+def inbox_detail(request, username):
+    user_id = request.user
+    message_list = ChatMessage.objects.filter(
+        id__in=Subquery(
+            User.objects.filter(
+                Q(sender__receiver=user_id) |
+                Q(receiver__sender=user_id)
+            ).distinct().annotate(
+                last_msg=Subquery(
+                    ChatMessage.objects.filter(
+                        Q(sender=OuterRef("id"), receiver=user_id) |
+                        Q(receiver=OuterRef("id"), sender=user_id)
+                    ).order_by("-id")[:1].values_list("id", flat=True)
+                )
+            ).values_list("last_msg", flat=True).order_by("-id")
+        )
+    ).order_by("-id")
+
+    sender = request.user
+    receiver = User.objects.get(username=username)
+    receiver_details = User.objects.get(username=username)
+
+    message_detail = ChatMessage.objects.filter(
+        Q(sender=sender, receiver=receiver) | Q(
+            receiver=sender, sender=receiver)
+    ).order_by("date")
+
+    message_detail.update(is_read=True)
+
+    if message_detail:
+        r = message_detail.first()
+        receiver = User.objects.get(username=r.receiver)
+    else:
+        receiver = User.objects.get(username=username)
+
+    context = {
+        "message_list": message_list,
+        "sender": sender,
+        "receiver": receiver,
+        "receiver_details": receiver_details,
+        "message_detail": message_detail,
+    }
+    return render(request, "chat/inbox_detail.html", context)

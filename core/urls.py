@@ -9,6 +9,7 @@ urlpatterns = [
     path('post/<slug:slug>/', views.post_detail, name='post-detail'),
 
     path('core/inbox/', views.inbox, name='inbox'),
+    path('core/inbox/<username>/', views.inbox_detail, name='inbox_detail'),
 
     # Ajax URLs
     path('create-post/', views.create_post, name='create-post'),
