@@ -52,6 +52,19 @@ def send_notification(user, sender, post, comment, notification_type):
     return notification
 
 
+def update_notification_status(request):
+    id = request.GET['id']
+    notification = Notification.objects.get(id=id)
+
+    notification.is_read = True
+    notification.save()
+
+    data = {
+        "bool": notification.is_read,
+    }
+    return JsonResponse({"data": data})
+
+
 @csrf_exempt
 def create_post(request):
 
@@ -368,3 +381,21 @@ def inbox_detail(request, username):
         "message_detail": message_detail,
     }
     return render(request, "chat/inbox_detail.html", context)
+
+
+def block_user(request):
+    id = request.GET['id']
+    user = request.user
+    friend = User.objects.get(id=id)
+
+    if user.id == friend.id:
+        return JsonResponse({"error": "You cannot block yourself"})
+
+    if friend in user.profile.friends.all():
+        user.profile.blocked.add(friend)
+        user.profile.friends.remove(friend)
+        friend.profile.friends.remove(user)
+    else:
+        return JsonResponse({"error": "You cannot block someone that is not your friend"})
+
+    return JsonResponse({"success": "User blocked"})

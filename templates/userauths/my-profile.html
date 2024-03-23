@@ -41,11 +41,12 @@
 
                     </div>
 
+                    <!-- Tabs title -->
                     <div class="flex justify-between lg:border-t border-gray-100 flex-col-reverse lg:flex-row pt-2">
                         <nav class="responsive-nav pl-3">
                             <ul uk-switcher="connect: #timeline-tab; animation: uk-animation-fade">
                                 <li><a href="#">Timeline</a></li>
-                                <li><a href="#">Friends <span>{{ profile.friends.all.count }}</span> </a></li>
+                                <li id="friends-tab" data-friends-tab="friends-tab" class=""><a href="#">Friends <span>{{ profile.friends.all.count }}</span> </a></li>
                                 <li><a href="#">Photoes </a></li>
                                 <li><a href="#">Pages</a></li>
                                 <li><a href="#">Groups</a></li>
@@ -117,6 +118,7 @@
 
                 </div>
 
+                <!-- Tabs content-->
                 <div class="uk-switcher lg:mt-8 mt-4" id="timeline-tab">
 
                     <!-- Timeline -->
@@ -534,7 +536,7 @@
 
                             {% for friend in profile.friends.all %}
                             <div class="card p-2">
-                                <a href="{% url "userauths:profile" friend.profile.user %}">
+                                <a href="{% url "userauths:profile" friend.profile.user.username %}">
                                     <img src="{{ friend.profile.image.url }}" class="h-36 object-cover rounded-md shadow-sm w-full">
                                 </a>
                                 <div class="pt-3 px-1">

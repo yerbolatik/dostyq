@@ -258,12 +258,10 @@
                             </div>
                             
                             <!-- Notifications-->
-
                             <a href="#" class="is_icon" uk-tooltip="title: Notifications">
                                 <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path></svg>
-                                <span>{{ unread_count }}</span>
+                                <span>{{ notification.all.count }}</span>
                             </a>
-
                             <div uk-drop="mode: click" class="header_dropdown">
                                 <div class="dropdown_scrollbar" data-simplebar>
                                     <div class="drop_headline">
@@ -278,13 +276,10 @@
                                         </div>
                                     </div>
                                     <ul>
+
                                         {% for notification in notification %}
                                             <li class="{% if notification.is_read == False %}not-read{% endif %} mb-3 mt-3">
-                                                {% if notification.notification_type == "Friend Request" %}  
-                                                <a href="{% url 'userauths:my-profile' %}" id="friends-tab">
-                                                {% else %}
-                                                    <a href="#" id=notification-link data-notification-id="{{ notification.id }}">
-                                                {% endif %} 
+                                                <a href="#">
                                                     <div class="drop_avatar">
                                                         <img src="{{ notification.sender.profile.image.url }}" alt="">
                                                     </div>
@@ -315,20 +310,11 @@
                                                         </p>
                                                         <time> {{ notification.date|timesince}} ago </time>
                                                     </div>
-
-                                                    {% if notification.notification_type == "Friend Request" %}
-                                                        <div class="d-flex justify-content-end" id="friend-request-button-div">
-                                                            <a id="accept-friend-request"  data-request-id="{{friend.sender.id}}" class="accept-friend-request-hide{{friend.sender.id}} flex items-center justify-center h-6 px-2 rounded-md bg-blue-600 text-white space-x-1.5 hover:text-white" style="margin-right: 10px; margin-bottom: 10px;"> 
-                                                                <span style="cursor: pointer; font-size: 10px;" class="text-white accept-friend-request{{friend.sender.id}}" id="friend-text"><i class="fas fa-user-plus"></i> Accept </span>
-                                                            </a>
-                                                            <a id="reject-friend-request"  data-request-id="{{friend.sender.id}}" class="reject-friend-request-hide{{friend.sender.id}} flex items-center justify-center h-6 px-2 rounded-md bg-red-600 text-white space-x-1.5 hover:text-white" style="margin-right: 10px; margin-bottom: 10px;"> 
-                                                                <span style="cursor: pointer; font-size: 10px;" class="text-white reject-friend-request{{friend.sender.id}}" id="friend-text"><i class="fas fa-user-minus"></i> Reject </span>
-                                                            </a>
-                                                        </div>
-                                                    {% endif %}
                                                 </a>
-                                            </li>
+                                        </li>
                                         {% endfor %}
+
+                                        
                                     </ul>
                                 </div>
                             </div>
@@ -336,7 +322,7 @@
                             <!-- Message -->
                             <a href="#" class="is_icon" uk-tooltip="title: Message">
                                 <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clip-rule="evenodd"></path></svg>
-                                <span>{{ chat_message.count }}</span>
+                                <span>4</span>
                             </a>
                             <div uk-drop="mode: click" class="header_dropdown is_message">
                                 <div class="dropdown_scrollbar" data-simplebar>
@@ -352,33 +338,87 @@
                                         </div>
                                     </div>
                                     <input type="text" class="uk-input" placeholder="Search in Messages">
-                                    <ul style="overflow: hidden;">
-                                        {% for message in chat_message %}
-                                            {% if request.user == message.sender %}
-                                                <li class="un-read" style="overflow: hidden;">
-                                                    <a href="{% url 'core:inbox_detail' message.reciever.username %}">
-                                                        <div class="drop_avatar"> <img style="object-fit: cover; width: 40px; height: 40px;" src="{{message.reciever.profile.image.url}}" alt="">
-                                                        </div>
-                                                        <div class="drop_text">
-                                                            <strong> {{message.reciever.profile.full_name}} </strong> <time>{{message.date|timesince}} ago</time>
-                                                            <p> {{message.message|truncatechars:30}}</p>
-                                                        </div>
-                                                    </a>
-                                                </li>
-                                            {% endif %}
-                                            {% if request.user == message.reciever %}
-                                                <li class="un-read" style="overflow: hidden;">
-                                                    <a href="{% url 'core:inbox_detail' message.sender.username %}">
-                                                        <div class="drop_avatar"> <img style="object-fit: cover; width: 40px; height: 40px;" src="{{message.sender.profile.image.url}}" alt="">
-                                                        </div>
-                                                        <div class="drop_text">
-                                                            <strong> {{message.sender.profile.full_name}} </strong> <time><small>{{message.date|timesince}} ago</small></time>
-                                                            <p> {{message.message|truncatechars:30}}</p>
-                                                        </div>
-                                                    </a>    
-                                                </li>
-                                            {% endif %}
-                                        {% endfor %}
+                                    <ul>
+                                        <li class="un-read">
+                                            <a href="#">
+                                                <div class="drop_avatar"> <img src="{% static 'assets/images/avatars/avatar-7.jpg' %}" alt="">
+                                                </div>
+                                                <div class="drop_text">
+                                                    <strong> Stella Johnson </strong> <time>12:43 PM</time>
+                                                    <p> Alex will explain you how ... </p>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <div class="drop_avatar"> <img src="{% static 'assets/images/avatars/avatar-1.jpg' %}" alt="">
+                                                </div>
+                                                <div class="drop_text">
+                                                    <strong> Adrian Mohani </strong> <time> 6:43 PM</time>
+                                                    <p> Thanks for The Answer sit amet... </p>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <div class="drop_avatar"> <img src="{% static 'assets/images/avatars/avatar-6.jpg' %}" alt="">
+                                                </div>
+                                                <div class="drop_text">
+                                                    <strong>Alia Dolgove </strong> <time> Wed </time>
+                                                    <p> Alia just joined Messenger! </p>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <div class="drop_avatar"> <img src="{% static 'assets/images/avatars/avatar-5.jpg' %}" alt="">
+                                                </div>
+                                                <div class="drop_text">
+                                                    <strong> Jonathan Madano </strong> <time> Sun</time>
+                                                    <p> Replay Your Comments insit amet consectetur </p>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li class="un-read">
+                                            <a href="#">
+                                                <div class="drop_avatar"> <img src="{% static 'assets/images/avatars/avatar-2.jpg' %}" alt="">
+                                                </div>
+                                                <div class="drop_text">
+                                                    <strong> Stella Johnson </strong> <time>12:43 PM</time>
+                                                    <p> Alex will explain you how ... </p>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <div class="drop_avatar"> <img src="{% static 'assets/images/avatars/avatar-1.jpg' %}" alt="">
+                                                </div>
+                                                <div class="drop_text">
+                                                    <strong> Adrian Mohani </strong> <time> 6:43 PM</time>
+                                                    <p> Thanks for The Answer sit amet... </p>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <div class="drop_avatar"> <img src="{% static 'assets/images/avatars/avatar-3.jpg' %}" alt="">
+                                                </div>
+                                                <div class="drop_text">
+                                                    <strong>Alia Dolgove </strong> <time> Wed </time>
+                                                    <p> Alia just joined Messenger! </p>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <div class="drop_avatar"> <img src="{% static 'assets/images/avatars/avatar-4.jpg' %}" alt="">
+                                                </div>
+                                                <div class="drop_text">
+                                                    <strong> Jonathan Madano </strong> <time> Sun</time>
+                                                    <p> Replay Your Comments insit amet consectetur </p>
+                                                </div>
+                                            </a>
+                                        </li>
                                     </ul>
                                 </div>
                                 <a href="{% url "core:inbox" %}" class="see-all"> See all in Messages</a>
@@ -617,9 +657,10 @@
                     <li>
                         <a href="#">
                             <ion-icon name="log-in-outline" class="side-icon"></ion-icon> <span>  Authentication  </span> </a>
-                            {% if request.user.is_authenticated %}
-                            <ul><li><a href="{% url 'userauths:logout' %}">Sign Out </a></li></ul>
-                            {% endif %}
+                        <ul>
+                            <li><a href="form-login.html">form login </a></li>
+                            <li><a href="form-register.html">form register</a></li>
+                        </ul>
                     </li>
 
                 </ul>
@@ -645,19 +686,6 @@
         {% block content %}
         
         {% endblock  %}
-
-
-        <script>
-            {% for message in messages %}
-    
-            Swal.fire({
-                icon: '{{message.tags}}',
-                title: '{{message}}',
-                text: '{{message.tags}}',
-                timer: 1500
-            })
-            {% endfor %}
-        </script>
 
     <!-- For Night mode -->
     <script>

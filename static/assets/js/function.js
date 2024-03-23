@@ -435,4 +435,47 @@ $(document).ready(function() {
             }
         })
     })
+
+
+    // Block User
+    $(document).on("click", "#block-user-btn", function(){
+        let id = $(this).attr("data-block-user")
+        console.log("Blocked User ID:", id);
+
+        $.ajax({
+            url:"/block-user/",
+            dataType: "json",
+            beforeSend: function(){
+                $("#block-user-btn").html("<i class='fas fa-spinner fa-spin'></i>")
+            },
+            data: {
+                "id": id
+            },
+
+            success: function(response){
+                console.log(response);
+                $(".block-text"+id).html("<i class='fas fa-check-circle'></i> User Blocked Successfully.")
+
+            }
+        })
+    })
+
+
+    // Is_read
+    $(document).on("click", "#notification-link", function(){
+        let id = $(this).attr("data-notification-id")
+        console.log("Notification ID:", id);
+
+        $.ajax({
+            url:"/update-notification/",
+            dataType: "json",
+            data: {
+                "id": id
+            },
+            success: function(response){
+                console.log(response);
+            }
+        })      
+    })
+
 })

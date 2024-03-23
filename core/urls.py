@@ -25,4 +25,7 @@ urlpatterns = [
          name='accept-friend-request'),
     path('reject-friend-request/', views.reject_friend_request,
          name='reject-friend-request'),
+    path('block-user/', views.block_user, name='block-user'),
+    path('update-notification/', views.update_notification_status,
+         name='update-notification'),
 ]

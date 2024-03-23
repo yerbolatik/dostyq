@@ -2,14 +2,19 @@
 {% load static %}
 
 {% block content %}
+<style>
+    html {
+        background-color: white !important;
+    }
+</style>
 
         <!-- Main Contents -->
-        <div class="main_content">
+        <div class="main_content" >
 
             <span uk-toggle="target: .message-content;" class="fixed left-0 top-36 bg-red-600 z-10 py-1 px-4 rounded-r-3xl text-white"> Users</span>
 
-            <div class="messages-container">
-                <div class="messages-container-inner">
+            <div class="messages-container" >
+                <div class="messages-container-inner" >
 
 
                     <div class="messages-inbox">
@@ -74,14 +79,17 @@
                     </div>
 
 
-                    <div class="message-content">
+                    <div class="message-content" >
 
                         <div class="messages-headline">
                             <div class="flex">
                                 <img class="mr-1" src="{{ receiver_details.profile.image.url }}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;" alt="">
                                 <h4 class="ml-1"> {{ receiver_details.profile.full_name|title }} </h4>
                             </div>
-                            <a href="#" class="message-action text-red-500"><i class="icon-feather-trash-2"></i> <span class="md:inline hidden"> Delete Conversation</span> </a>
+
+                            {% if receiver_details.profile.friends.all %}
+                                <a href="#" id="block-user-btn" data-block-user="{{ receiver_details.id }}" class="message-action text-red-500 block-text{{receiver_details.id}}"><span class="md:inline hidden"> Block {{ receiver_details.profile.full_name }}</span> </a>
+                            {% endif %}
                         </div>
 
                         <div class="message-content-scrolbar">
@@ -198,7 +206,6 @@
                         chatMessage+= '</div>'
         
                         $("#chat-messages").append(chatMessage)
-
                         var chatContainer = document.querySelector('.chat_container');
                         chatContainer.scrollTop = chatContainer.scrollHeight;
                         console.log("No");

@@ -1,8 +1,9 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.template.loader import render_to_string
 
 from core.models import Post, FriendRequest
 from userauths.forms import UserRegisterForm
@@ -76,10 +77,12 @@ def LogoutView(request):
 def my_profile(request):
     profile = request.user.profile
     posts = Post.objects.filter(active=True, user=request.user).order_by("-id")
+    tab = request.GET.get('tab', 'timeline')
 
     context = {
         "profile": profile,
-        "posts": posts
+        "posts": posts,
+        "tab": tab,
     }
     return render(request, "userauths/my-profile.html", context)
 
@@ -114,3 +117,14 @@ def friend_profile(request, username):
         "bool": bool,
     }
     return render(request, "userauths/friend-profile.html", context)
+
+
+def change_profile_tab(request):
+    if request.method == 'POST' and request.is_ajax():
+        tab = request.POST.get('tab')
+        if tab == 'friends':
+            # Здесь вы можете добавить вашу логику для получения информации о друзьях
+            # Затем возвращаем обновленный HTML для вкладки "Friends"
+            friends_html = render_to_string('partials/friends_tab.html')
+            return JsonResponse({'html': friends_html})
+    return JsonResponse({'error': 'Invalid request'})
