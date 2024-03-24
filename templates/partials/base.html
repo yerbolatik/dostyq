@@ -57,45 +57,71 @@
                     <!-- search icon for mobile -->
                     <div class="header-search-icon" uk-toggle="target: #wrapper ; cls: show-searchbox"> </div>
                     <div class="header_search"><i class="uil-search-alt"></i>
-                        <input value="" type="text" class="form-control" placeholder="Search for Friends , Videos and more.." autocomplete="off">
+                        <input value="" type="text" class="form-control" placeholder="Search for Friends , Videos and more.." id="search-input" autocomplete="off">
                         <div uk-drop="mode: click" class="header_search_dropdown">
-
+                            
                             <h4 class="search_title"> Recently </h4>
-                            <ul>
+                            <!-- <ul>
+                                
                                 <li>
                                     <a href="#">  
                                         <img src="{% static 'assets/images/avatars/avatar-1.jpg' %}" alt="" class="list-avatar">
                                         <div class="list-name">  Erica Jones </div>
                                     </a>
                                 </li>
-                                <li>
-                                    <a href="#">  
-                                        <img src="{% static 'assets/images/avatars/avatar-2.jpg' %}" alt="" class="list-avatar">
-                                        <div class="list-name">  Coffee  Addicts </div>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">  
-                                        <img src="{% static 'assets/images/avatars/avatar-3.jpg' %}" alt="" class="list-avatar">
-                                        <div class="list-name"> Mountain Riders </div>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">  
-                                        <img src="{% static 'assets/images/avatars/avatar-4.jpg' %}" alt="" class="list-avatar">
-                                        <div class="list-name"> Property Rent And Sale  </div>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">  
-                                        <img src="{% static 'assets/images/avatars/avatar-5.jpg' %}" alt="" class="list-avatar">
-                                        <div class="list-name">  Erica Jones </div>
-                                    </a>
-                                </li>
-                            </ul>
 
+                            </ul> -->
+                            <ul id="search-results"></ul>
                         </div>
                     </div>
+
+
+                        <script>
+                            $(document).ready(function() {
+                                $('#search-input').on('input', function() {
+                                    const query = $(this).val().trim();
+
+                                    if (query) {
+                                        $.ajax({
+                                            url: '/search/',
+                                            data: {
+                                                'q': query,
+                                            },
+                                            dataType: 'json',
+                                            success: function(data) {
+                                                const resultsUl = $('#search-results');
+                                                resultsUl.empty();
+
+                                                for (const user of data.users) {
+                                                    const listItem = $('<li></li>');
+
+                                                    const link = $('<a></a>').attr('href', '/user/profile/'+user.username + '/');
+                                                    listItem.append(link);
+
+                                                    if (user.profile_image) {
+                                                        const profileImage = $('<img>').attr('src', user.profile_image);
+                                                        profileImage.attr('alt', 'Profile Image');
+                                                        profileImage.addClass('list-avatar');
+                                                        link.append(profileImage);
+                                                    }
+
+                                                    const nameDiv = $('<div></div>').addClass('list-name').text(user.full_name);
+                                                    link.append(nameDiv);
+
+                                                    resultsUl.append(listItem);
+                                                }
+                                            },
+                                            error: function() {
+                                                console.log('Error occurred during the AJAX request.');
+                                            }
+                                        });
+                                    } else {
+                                        $('#search-results').empty();
+                                    }
+                                });
+                            });
+
+                        </script>
 
                     <div class="right_side">
 
@@ -125,89 +151,11 @@
                                             <button class="type"> Remove</button>
                                         </div>
                                     </li>
-                                    <li>
-                                        <div class="cart_avatar">
-                                            <img src="{% static 'assets/images/product/13.jpg' %}" alt="">
-                                        </div>
-                                        <div class="cart_text">
-                                            <div class=" font-semibold leading-4 mb-1.5 text-base line-clamp-1"> Parfum Spray</div>
-                                            <p class="text-sm">Type Parfums </p>
-                                        </div>
-                                        <div class="cart_price">
-                                            <span> $16.99 </span>
-                                            <button class="type"> Remove</button>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="cart_avatar">
-                                            <img src="{% static 'assets/images/product/15.jpg' %}" alt="">
-                                        </div>
-                                        <div class="cart_text">
-                                            <div class=" font-semibold leading-4 mb-1.5 text-base line-clamp-1"> Herbal Shampoo </div>
-                                            <p class="text-sm">Type Herbel </p>
-                                        </div>
-                                        <div class="cart_price">
-                                            <span> $12.99 </span>
-                                            <button class="type"> Remove</button>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="cart_avatar">
-                                            <img src="{% static 'assets/images/product/14.jpg' %}" alt="">
-                                        </div>
-                                        <div class="cart_text">
-                                            <div class=" font-semibold leading-4 mb-1.5 text-base line-clamp-1"> Wood Chair </div>
-                                            <p class="text-sm">Type Furniture </p>
-                                        </div>
-                                        <div class="cart_price">
-                                            <span> $19.99 </span>
-                                            <button class="type"> Remove</button>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="cart_avatar">
-                                            <img src="{% static 'assets/images/product/9.jpg' %}" alt="">
-                                        </div>
-                                        <div class="cart_text">
-                                            <div class=" font-semibold leading-4 mb-1.5 text-base line-clamp-1"> Strawberries FreshRipe </div>
-                                            <p class="text-sm">Type Fruit </p>
-                                        </div>
-                                        <div class="cart_price">
-                                            <span> $12.99 </span>
-                                            <button class="type"> Remove</button>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="cart_avatar">
-                                            <img src="{% static 'assets/images/product/2.jpg' %}" alt="">
-                                        </div>
-                                        <div class="cart_text">
-                                            <div class=" font-semibold leading-4 mb-1.5 text-base line-clamp-1"> Wireless headphones </div>
-                                            <p class="text-sm">Type Accessories </p>
-                                        </div>
-                                        <div class="cart_price">
-                                            <span> $14.99 </span>
-                                            <button class="type"> Remove</button>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="cart_avatar">
-                                            <img src="{% static 'assets/images/product/13.jpg' %}" alt="">
-                                        </div>
-                                        <div class="cart_text">
-                                            <div class=" font-semibold leading-4 mb-1.5 text-base line-clamp-1"> Parfum Spray</div>
-                                            <p class="text-sm">Type Parfums </p>
-                                        </div>
-                                        <div class="cart_price">
-                                            <span> $16.99 </span>
-                                            <button class="type"> Remove</button>
-                                        </div>
-                                    </li>
                                 </ul>
 
                                 <div class="cart_footer">
-                                    <p> Subtotal : $ 320 </p>
-                                    <h1> Total : <strong> $ 320</strong> </h1>
+                                    <p> Subtotal : $ 14.99 </p>
+                                    <h1> Total : <strong> $ 14.99</strong> </h1>
                                 </div>
                             </div>
 
@@ -272,7 +220,8 @@
                                             <a href="#" data-tippy-placement="left" title="Notifications">
                                                 <ion-icon name="settings-outline"></ion-icon>
                                             </a>
-                                            <a href="#" data-tippy-placement="left" title="Mark as read all">
+                                            {% csrf_token %}
+                                            <a href="#" id="mark-as-read-all" data-tippy-placement="left" title="Mark as read all">
                                                 <ion-icon name="checkbox-outline"></ion-icon>
                                             </a>
                                         </div>
@@ -281,7 +230,7 @@
                                         {% for notification in notification %}
                                             <li class="{% if notification.is_read == False %}not-read{% endif %} mb-3 mt-3">
                                                 {% if notification.notification_type == "Friend Request" %}  
-                                                <a href="{% url 'userauths:my-profile' %}" id="friends-tab">
+                                                <a href="#">
                                                 {% else %}
                                                     <a href="#" id=notification-link data-notification-id="{{ notification.id }}">
                                                 {% endif %} 
@@ -317,14 +266,18 @@
                                                     </div>
 
                                                     {% if notification.notification_type == "Friend Request" %}
-                                                        <div class="d-flex justify-content-end" id="friend-request-button-div">
-                                                            <a id="accept-friend-request"  data-request-id="{{friend.sender.id}}" class="accept-friend-request-hide{{friend.sender.id}} flex items-center justify-center h-6 px-2 rounded-md bg-blue-600 text-white space-x-1.5 hover:text-white" style="margin-right: 10px; margin-bottom: 10px;"> 
-                                                                <span style="cursor: pointer; font-size: 10px;" class="text-white accept-friend-request{{friend.sender.id}}" id="friend-text"><i class="fas fa-user-plus"></i> Accept </span>
-                                                            </a>
-                                                            <a id="reject-friend-request"  data-request-id="{{friend.sender.id}}" class="reject-friend-request-hide{{friend.sender.id}} flex items-center justify-center h-6 px-2 rounded-md bg-red-600 text-white space-x-1.5 hover:text-white" style="margin-right: 10px; margin-bottom: 10px;"> 
-                                                                <span style="cursor: pointer; font-size: 10px;" class="text-white reject-friend-request{{friend.sender.id}}" id="friend-text"><i class="fas fa-user-minus"></i> Reject </span>
-                                                            </a>
-                                                        </div>
+                                                        {% with sender_profile=notification.sender.profile %}
+                                                            {% if request.user not in sender_profile.friends.all %}
+                                                                <div class="d-flex justify-content-end" id="friend-request-button-div">
+                                                                    <a id="accept-friend-request"  data-request-id="{{notification.sender.id}}" class="accept-friend-request-hide{{notification.sender.id}} flex items-center justify-center h-6 px-2 rounded-md bg-blue-600 text-white space-x-1.5 hover:text-white" style="margin-right: 10px; margin-bottom: 10px;"> 
+                                                                        <span style="cursor: pointer; font-size: 10px;" class="text-white accept-friend-request{{notification.sender.id}}" id="friend-text"><i class="fas fa-user-plus"></i> Accept </span>
+                                                                    </a>
+                                                                    <a id="reject-friend-request"  data-request-id="{{notification.sender.id}}" class="reject-friend-request-hide{{notification.sender.id}} flex items-center justify-center h-6 px-2 rounded-md bg-red-600 text-white space-x-1.5 hover:text-white" style="margin-right: 10px; margin-bottom: 10px;"> 
+                                                                        <span style="cursor: pointer; font-size: 10px;" class="text-white reject-friend-request{{notification.sender.id}}" id="friend-text"><i class="fas fa-user-minus"></i> Reject </span>
+                                                                    </a>
+                                                                </div>
+                                                            {% endif %}
+                                                        {% endwith %}
                                                     {% endif %}
                                                 </a>
                                             </li>
@@ -333,56 +286,62 @@
                                 </div>
                             </div>
 
-                            <!-- Message -->
-                            <a href="#" class="is_icon" uk-tooltip="title: Message">
-                                <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clip-rule="evenodd"></path></svg>
-                                <span>{{ chat_message.count }}</span>
-                            </a>
-                            <div uk-drop="mode: click" class="header_dropdown is_message">
-                                <div class="dropdown_scrollbar" data-simplebar>
-                                    <div class="drop_headline">
-                                        <h4>Messages </h4>
-                                        <div class="btn_action">
-                                            <a href="#" data-tippy-placement="left" title="Notifications">
-                                                <ion-icon name="settings-outline" uk-tooltip="title: Message settings ; pos: left"></ion-icon>
-                                            </a>
-                                            <a href="#" data-tippy-placement="left" title="Mark as read all">
-                                                <ion-icon name="checkbox-outline"></ion-icon>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <input type="text" class="uk-input" placeholder="Search in Messages">
-                                    <ul style="overflow: hidden;">
-                                        {% for message in chat_message %}
-                                            {% if request.user == message.sender %}
-                                                <li class="un-read" style="overflow: hidden;">
-                                                    <a href="{% url 'core:inbox_detail' message.reciever.username %}">
-                                                        <div class="drop_avatar"> <img style="object-fit: cover; width: 40px; height: 40px;" src="{{message.reciever.profile.image.url}}" alt="">
-                                                        </div>
-                                                        <div class="drop_text">
-                                                            <strong> {{message.reciever.profile.full_name}} </strong> <time>{{message.date|timesince}} ago</time>
-                                                            <p> {{message.message|truncatechars:30}}</p>
-                                                        </div>
+                            <!-- Message Notifications-->
+                                <a href="#" class="is_icon" uk-tooltip="title: Message">
+                                    <svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clip-rule="evenodd"></path></svg>
+                                    <span>{{ unread_message_count }}</span>
+                                </a>
+                                    <div uk-drop="mode: click" class="header_dropdown is_message">
+                                        <div class="dropdown_scrollbar" data-simplebar>
+                                            <div class="drop_headline">
+                                                <h4>Messages </h4>
+                                                <div class="btn_action">
+                                                    <a href="#" data-tippy-placement="left" title="Notifications">
+                                                        <ion-icon name="settings-outline" uk-tooltip="title: Message settings ; pos: left"></ion-icon>
                                                     </a>
-                                                </li>
+                                                    <a href="#" data-tippy-placement="left" title="Mark as read all">
+                                                        <ion-icon name="checkbox-outline"></ion-icon>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <input type="text" class="uk-input" placeholder="Search in Messages">
+                                            <ul style="overflow: hidden;">
+                                            {% if unread_message_count > 0  %}
+                                                {% for message in unread_messages %}
+                                                        {% if request.user == message.sender %}
+                                                            <li class="un-read" style="overflow: hidden;">
+                                                                <a href="{% url 'core:inbox_detail' message.sender.username %}" id=notification-link data-notification-id="{{ notification.id }}">
+                                                                    <div class="drop_avatar"> <img style="object-fit: cover; width: 40px; height: 40px;" src="{{message.sender.profile.image.url}}" alt="">
+                                                                    </div>
+                                                                    <div class="drop_text">
+                                                                        <strong> {{message.reciever.profile.full_name}} </strong> <time><small>{{message.date|timesince}} ago</small></time>
+                                                                        <p> {{message.message|truncatechars:30}}</p>
+                                                                    </div>
+                                                                </a>    
+                                                            </li>
+                                                        {% endif %}
+                                                        {% if request.user == message.receiver %}
+                                                            <li class="un-read" style="overflow: hidden;">
+                                                                <a href="{% url 'core:inbox_detail' message.sender.username %}">
+                                                                    <div class="drop_avatar"> <img style="object-fit: cover; width: 40px; height: 40px;" src="{{message.sender.profile.image.url}}" alt="">
+                                                                    </div>
+                                                                    <div class="drop_text">
+                                                                        <strong> {{message.sender.profile.full_name}} </strong> <time><small>{{message.date|timesince}} ago</small></time>
+                                                                        <p> {{message.message|truncatechars:30}}</p>
+                                                                    </div>
+                                                                </a>    
+                                                            </li>
+                                                        {% endif %}
+                                                {% endfor %}
+                                            {% else %}
+                                                <p>No messages yet</p>
                                             {% endif %}
-                                            {% if request.user == message.reciever %}
-                                                <li class="un-read" style="overflow: hidden;">
-                                                    <a href="{% url 'core:inbox_detail' message.sender.username %}">
-                                                        <div class="drop_avatar"> <img style="object-fit: cover; width: 40px; height: 40px;" src="{{message.sender.profile.image.url}}" alt="">
-                                                        </div>
-                                                        <div class="drop_text">
-                                                            <strong> {{message.sender.profile.full_name}} </strong> <time><small>{{message.date|timesince}} ago</small></time>
-                                                            <p> {{message.message|truncatechars:30}}</p>
-                                                        </div>
-                                                    </a>    
-                                                </li>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                                <a href="{% url "core:inbox" %}" class="see-all"> See all in Messages</a>
-                            </div>
+                                            </ul>
+                                        </div>
+                                        <a href="{% url "core:inbox" %}" class="see-all"> See all in Messages</a>
+                                    </div>
+                            <!-- Message Notifications End -->
+
 
 
                             <a href="#">
@@ -559,7 +518,7 @@
                     <div uk-drop="pos: left-center ;animation: uk-animation-slide-left-small">
                         <div class="contact-list-box">
                             <div class="contact-avatar">
-                                <img src="{{f.profile.image.url}}" alt="">
+                                <img src="{{friend.profile.image.url}}" alt="">
                                 <span class="user_status status_online"></span>
                             </div>
                             <div class="contact-username">  {{friend.profile.full_name}}</div>

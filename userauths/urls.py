@@ -10,4 +10,7 @@ urlpatterns = [
 
     path('my-profile/', views.my_profile, name='my-profile'),
     path('profile/<username>', views.friend_profile, name='profile'),
+
+    path("profile-update/", views.profile_update, name="profile-update"),
+
 ]

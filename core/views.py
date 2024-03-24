@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import OuterRef, Subquery, Q
 
 from core.models import Post, Comment, ReplyComment, Friend, FriendRequest, Notification, ChatMessage
-from userauths.models import User
+from userauths.models import User, Profile
 
 
 # Notification Keys
@@ -63,6 +63,17 @@ def update_notification_status(request):
         "bool": notification.is_read,
     }
     return JsonResponse({"data": data})
+
+
+def mark_as_read_all(request):
+    if request.method == "POST":
+        user = request.user
+        notifications = Notification.objects.filter(user=user, is_read=False)
+        notifications.update(is_read=True)
+
+        return JsonResponse({"success": "All notifications marked as read."})
+    else:
+        return JsonResponse({"error": "Invalid request method."})
 
 
 @csrf_exempt
@@ -399,3 +410,31 @@ def block_user(request):
         return JsonResponse({"error": "You cannot block someone that is not your friend"})
 
     return JsonResponse({"success": "User blocked"})
+
+
+def search_users(request):
+    query = request.GET.get('q')
+    if query:
+        users = User.objects.filter(username__icontains=query) | User.objects.filter(
+            email__icontains=query) | User.objects.filter(full_name__icontains=query)
+
+        users_data = []
+        for user in users:
+            try:
+                profile = Profile.objects.get(user=user)
+                profile_image = profile.image.url
+                full_name = profile.full_name
+            except Profile.DoesNotExist:
+                profile_image = None
+                full_name = None
+
+            user_data = {
+                'username': user.username,
+                'full_name': full_name,
+                'email': user.email,
+                'profile_image': profile_image,
+            }
+            users_data.append(user_data)
+    else:
+        users_data = []
+    return JsonResponse({'users': users_data})

@@ -478,4 +478,23 @@ $(document).ready(function() {
         })      
     })
 
+    // Is read all
+    $("#mark-as-read-all").click(function () {
+        var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+        $.ajax({
+            url: "/mark-as-read-all/", // Замените на ваш URL-адрес для обработки запроса
+            type: "POST",
+            dataType: "json",
+            headers: { "X-CSRFToken": csrftoken },
+            success: function (response) {
+                console.log(response); // Обработайте ответ, если необходимо
+            },
+            error: function (xhr, errmsg, err) {
+                console.log(xhr.status + ": " + xhr.responseText); // Обработайте ошибку, если необходимо
+            }
+        });
+    });
+
+
+    
 })

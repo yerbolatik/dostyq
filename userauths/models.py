@@ -7,14 +7,19 @@ from shortuuid.django_fields import ShortUUIDField
 import shortuuid
 
 RELATIONSHIP = (
-    ('single', 'Single'),
-    ('married', 'Married'),
-    ('in love', 'In love')
+    ('Single', 'Single'),
+    ('Married', 'Married'),
+    ('In love', 'In love')
 )
 
 GENDER = (
     ('male', 'Male'),
     ('female', 'Female')
+)
+
+WHO_CAN_SEE_MY_FRIENDS = (
+    ("Only Me", "Only Me"),
+    ("Everyone", "Everyone"),
 )
 
 
@@ -53,6 +58,8 @@ class Profile(models.Model):
     gender = models.CharField(max_length=100, choices=GENDER, default='male')
     relationship = models.CharField(
         max_length=100, choices=RELATIONSHIP, default='single')
+    friends_visibility = models.CharField(
+        max_length=100, choices=WHO_CAN_SEE_MY_FRIENDS, null=True, blank=True, default="Everyone")
     bio = models.CharField(max_length=200, null=True, blank=True)
     about_me = models.TextField(null=True, blank=True)
 
@@ -71,7 +78,7 @@ class Profile(models.Model):
 
     followers = models.ManyToManyField(
         User, blank=True, related_name='followers')
-    following = models.ManyToManyField(
+    followings = models.ManyToManyField(
         User, blank=True, related_name='following')
     friends = models.ManyToManyField(
         User, blank=True, related_name='friends')
@@ -92,12 +99,15 @@ class Profile(models.Model):
             self.slug = slugify(self.full_name) + '-' + str(uniqueid.lower())
         super(Profile, self).save(*args, **kwargs)
 
-    def create_user_profile(sender, instance, created, **kwargs):
-        if created:
-            Profile.objects.create(user=instance)
 
-    def save_user_profile(sender, instance, **kwargs):
-        instance.profile.save()
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
 
-    post_save.connect(create_user_profile, sender=User)
-    post_save.connect(save_user_profile, sender=User)
+
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
+
+
+post_save.connect(create_user_profile, sender=User)
+post_save.connect(save_user_profile, sender=User)

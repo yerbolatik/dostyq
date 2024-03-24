@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 
 from core.models import Post, FriendRequest
-from userauths.forms import UserRegisterForm
+from userauths.forms import UserRegisterForm, ProfileUpdateForm, UserUpdateForm
 from userauths.models import Profile, User
 
 
@@ -42,9 +42,6 @@ def RegisterView(request):
 
 
 def LoginView(request):
-    if request.user.is_authenticated:
-        messages.warning(request, "You are already login!")
-        return redirect("core:feed")
 
     if request.method == "POST":
         email = request.POST.get("email")
@@ -77,12 +74,10 @@ def LogoutView(request):
 def my_profile(request):
     profile = request.user.profile
     posts = Post.objects.filter(active=True, user=request.user).order_by("-id")
-    tab = request.GET.get('tab', 'timeline')
 
     context = {
         "profile": profile,
         "posts": posts,
-        "tab": tab,
     }
     return render(request, "userauths/my-profile.html", context)
 
@@ -115,16 +110,34 @@ def friend_profile(request, username):
         "profile": profile,
         "posts": posts,
         "bool": bool,
+        "bool_friend": bool_friend,
     }
     return render(request, "userauths/friend-profile.html", context)
 
 
-def change_profile_tab(request):
-    if request.method == 'POST' and request.is_ajax():
-        tab = request.POST.get('tab')
-        if tab == 'friends':
-            # Здесь вы можете добавить вашу логику для получения информации о друзьях
-            # Затем возвращаем обновленный HTML для вкладки "Friends"
-            friends_html = render_to_string('partials/friends_tab.html')
-            return JsonResponse({'html': friends_html})
-    return JsonResponse({'error': 'Invalid request'})
+@login_required
+def profile_update(request):
+    print("Handling profile update request...")
+
+    if request.method == "POST":
+        p_form = ProfileUpdateForm(
+            request.POST, request.FILES, instance=request.user.profile)
+        u_form = UserUpdateForm(request.POST, instance=request.user)
+
+        if p_form.is_valid() and u_form.is_valid():
+            p_form.save()
+            u_form.save()
+
+            messages.success(request, "Profile Updated Successfully.")
+            return redirect('userauths:profile-update')
+    else:
+        p_form = ProfileUpdateForm(instance=request.user.profile)
+        u_form = UserUpdateForm(instance=request.user)
+
+        print("POST request received.")
+
+    context = {
+        'p_form': p_form,
+        'u_form': u_form,
+    }
+    return render(request, 'userauths/profile-update.html', context)

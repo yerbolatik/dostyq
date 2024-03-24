@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'import_export',
     'channels',
+    'widget_tweaks',
+    'mathfilters',
 ]
 
 MIDDLEWARE = [

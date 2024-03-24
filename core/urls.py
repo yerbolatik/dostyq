@@ -8,8 +8,13 @@ urlpatterns = [
     path('', views.index, name='feed'),
     path('post/<slug:slug>/', views.post_detail, name='post-detail'),
 
+    # Chat
     path('core/inbox/', views.inbox, name='inbox'),
     path('core/inbox/<username>/', views.inbox_detail, name='inbox_detail'),
+
+    # Search
+    path('search/', views.search_users, name='search_users'),
+
 
     # Ajax URLs
     path('create-post/', views.create_post, name='create-post'),
@@ -28,4 +33,5 @@ urlpatterns = [
     path('block-user/', views.block_user, name='block-user'),
     path('update-notification/', views.update_notification_status,
          name='update-notification'),
+    path('mark-as-read-all/', views.mark_as_read_all, name='mark-as-read-all'),
 ]

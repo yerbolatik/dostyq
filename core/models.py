@@ -380,11 +380,24 @@ class ChatMessage(models.Model):
                          alphabet="abcdefghijklmnopqrstuvxyz")
 
     def __str__(self):
-        return self.user.username
+        if self.sender:
+            sender_name = self.sender.username
+        else:
+            sender_name = "Unknown sender"
+
+        if self.receiver:
+            receiver_name = self.receiver.username
+        else:
+            receiver_name = "Unknown receiver"
+
+        return f"Message from {sender_name} to {receiver_name}: {self.message}"
 
     class Meta:
         ordering = ["-date"]
         verbose_name_plural = "Chat Message"
 
     def thumbnail(self):
-        return mark_safe('<img src="/media/%s" width="50" height="50" object-fit:"cover" style="border-radius: 5px;" />' % (self.image))
+        if self.image:
+            return mark_safe('<img src="%s" width="50" height="50" style="border-radius: 5px; object-fit: cover;" />' % self.image.url)
+        else:
+            return 'No Image'
