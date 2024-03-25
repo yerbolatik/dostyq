@@ -1,5 +1,7 @@
+import os
 from django.db import models
 from django.db.models import Count
+from django.dispatch import receiver
 from django.utils.html import mark_safe
 from django.utils.text import slugify
 from userauths.models import User, Profile, user_directory_path
@@ -69,6 +71,27 @@ class Post(models.Model):
         comment = Comment.objects.filter(
             post=self, active=True).order_by("-id")
         return comment
+
+    def gallery_images(self):
+        return Gallery.objects.filter(post=self)
+
+    def title_len_count(self):
+        return len(self.title)
+
+    def galley_img_count(self):
+        return Gallery.objects.filter(post=self).count()
+
+
+@receiver(models.signals.pre_delete, sender=Post)
+def delete_image_file(sender, instance, **kwargs):
+    # Check if the image field has a value
+    if instance.image:
+        # Get the path of the image file
+        image_path = instance.image.path
+        # Check if the image file exists
+        if os.path.exists(image_path):
+            # Delete the image file
+            os.remove(image_path)
 
 
 class Gallery(models.Model):

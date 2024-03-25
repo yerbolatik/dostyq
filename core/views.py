@@ -1,12 +1,13 @@
 import shortuuid
 
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db.models import OuterRef, Subquery, Q
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.utils.text import slugify
 from django.utils.timesince import timesince
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import OuterRef, Subquery, Q
 
 from core.models import Post, Comment, ReplyComment, Friend, FriendRequest, Notification, ChatMessage
 from userauths.models import User, Profile
@@ -26,6 +27,9 @@ noti_friend_request_accepted = "Friend Request Accepted"
 def index(request):
     posts = Post.objects.filter(
         active=True, visibility="Everyone").order_by("-id")
+    paginator = Paginator(posts, 3)
+    page_number = request.GET.get('page')
+    posts = paginator.get_page(page_number)
     context = {
         "posts": posts
     }
@@ -106,8 +110,39 @@ def create_post(request):
                 "id": post.id,
             }})
 
-        else:
-            return JsonResponse({"error": "Image or title does not exists"})
+        elif title:
+            post = Post(
+                title=title,
+                visibility=visibility,
+                user=request.user,
+                slug=slugify(title) + '-' + str(uniqueid.lower())
+            )
+            post.save()
+
+            return JsonResponse({"post": {
+                "title": post.title,
+                "full_name": post.user.profile.full_name,
+                "profile_image": post.user.profile.image.url,
+                "date": timesince(post.date),
+                "id": post.id,
+            }})
+
+        elif image:
+            post = Post(
+                visibility=visibility,
+                image=image,
+                user=request.user,
+                slug=slugify(title) + '-' + str(uniqueid.lower())
+            )
+            post.save()
+
+            return JsonResponse({"post": {
+                "image": post.image.url,
+                "full_name": post.user.profile.full_name,
+                "profile_image": post.user.profile.image.url,
+                "date": timesince(post.date),
+                "id": post.id,
+            }})
 
     return JsonResponse({"data": "sent"})
 
@@ -438,3 +473,44 @@ def search_users(request):
     else:
         users_data = []
     return JsonResponse({'users': users_data})
+
+
+def games(request):
+    return render(request, 'games/all_games.html')
+
+
+def stack_brick(request):
+    return render(request, 'games/stack_brick.html')
+
+
+def snake(request):
+    return render(request, 'games/snake.html')
+
+
+def load_more_posts(request):
+    all_posts = Post.objects.filter(
+        active=True, visibility="Everyone").order_by('-date')
+
+    # Paginate the posts
+    paginator = Paginator(all_posts, 3)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    posts_data = []
+    for post in page_obj:
+        post_data = {
+            'title': post.title,
+            'profile_image': post.user.profile.image.url,
+            'full_name': post.user.profile.full_name,
+            'image_url': post.image.url if post.image else None,
+            'video': post.video.url if post.video else None,
+            'id': post.id,
+            'id': post.id,
+            'likes': post.likes.count(),
+            'slug': post.slug,
+            'views': post.views,
+            'date': timesince(post.date),
+        }
+        posts_data.append(post_data)
+
+    return JsonResponse({'posts': posts_data})
