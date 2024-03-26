@@ -12,5 +12,6 @@ urlpatterns = [
     path('profile/<username>', views.friend_profile, name='profile'),
 
     path("profile-update/", views.profile_update, name="profile-update"),
+    path("delete-user/", views.delete_user, name="delete-user"),
 
 ]

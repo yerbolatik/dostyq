@@ -8,7 +8,7 @@
             <li><a href="#"> <i class="uil-shield-check"></i> Security</a></li>
             <!-- <li><a href="#"> <i class="uil-bolt"></i> Membership</a></li> -->
             <!-- <li><a href="#"> <i class="uil-history"></i> Manage Sessions</a></li> -->
-            <li><a href="#"> <i class="uil-trash-alt"></i> Delete account</a></li>
+            <li class="{% if request.path == '/user/delete-user/'%}uk-active{% endif %}"><a href="{% url 'userauths:delete-user' %}"><i class="uil-trash-alt"></i> Delete account</a></li>
         </ul>
     </nav>
 </div>

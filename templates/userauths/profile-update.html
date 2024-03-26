@@ -36,8 +36,9 @@
                     <div class="lg:w-2/3">
 
                         
-
-                        <form method="POST" action="{% url 'userauths:profile-update' %}" class="lg:flex lg:flex-col justify-between lg:h-full" enctype="multipart/form-data">
+                        {{ user_form.errors }}
+                        {{ profile_form.errors }}
+                        <form method="POST" class="lg:flex lg:flex-col justify-between lg:h-full" enctype="multipart/form-data">
                             {% csrf_token %}
                             <!-- form header -->
                             <div class="lg:px-10 lg:py-8 p-6">
@@ -94,38 +95,42 @@
                                 </div>
                                 <div class="d-none">
                                     <div class="line">
-                                        {% render_field p_form.image onchange="loadFile(event)" class="hidden"  %}
+                                        {% render_field profile_form.image onchange="loadFile(event)" class="hidden"  %}
                                     </div>
                                     <div class="line">
-                                        {% render_field p_form.cover_image onchange="loadFile2(event)" class="hidden"  %}
+                                        {% render_field profile_form.cover_image onchange="loadFile2(event)" class="hidden"  %}
                                     </div>
                                 </div>
                                 <div class="line">
-                                    {% render_field p_form.full_name class="line__input" %}
+                                    {% render_field profile_form.full_name class="line__input" %}
                                     <span for="username" class="line__placeholder"> First Name   </span>
                                 </div>
                                 <div class="line">
-                                    {% render_field p_form.bio class="line__input"  %}
+                                    {% render_field profile_form.bio class="line__input"  %}
                                     <span for="username" class="line__placeholder"> Bio  </span>
                                 </div>
                                 <div class="line">
-                                    {% render_field p_form.about_me class="line__input" %}
-                                    <span for="username" class="line__placeholder"> About Me   </span>
+                                    {% render_field profile_form.gender class="line__input" %}
+                                    <span for="username" class="line__placeholder"> Gender   </span>
                                 </div>
                                 <div class="line">
-                                    {% render_field p_form.relationship class="line__input" %}
+                                    {% render_field profile_form.relationship class="line__input" %}
                                     <span for="username" class="line__placeholder"> Relationship Status   </span>
+                                </div>
+                                <div class="line">
+                                    {% render_field profile_form.about_me class="line__input" %}
+                                    <span for="username" class="line__placeholder"> About me   </span>
                                 </div>
                             </div>
 
-                            <div class="lg:py-4 lg:px-20 flex-1 space-y-4 p-6">
+                            <div class="lg:py-4 lg:px-20 flex-1 space-y-4 p-6" style="padding-top:80px;">
                                 <h4><b>Contact</b></h4>
                                 <div class="line">
-                                    {% render_field p_form.phone class="line__input" %}
+                                    {% render_field profile_form.phone class="line__input" %}
                                     <span for="username" class="line__placeholder"> Mobile Number   </span>
                                 </div>
                                 <div class="line">
-                                    {% render_field u_form.email class="line__input" %}
+                                    {% render_field user_form.email class="line__input" %}
                                     <span for="username" class="line__placeholder"> Email  </span>
                                 </div>
                             </div>
@@ -134,19 +139,19 @@
                             <div class="lg:py-4 lg:px-20 flex-1 space-y-4 p-6">
                                 <h4><b>Address</b></h4>
                                 <div class="line">
-                                    {% render_field p_form.address class="line__input" %}
+                                    {% render_field profile_form.address class="line__input" %}
                                     <span for="username" class="line__placeholder"> Address   </span>
                                 </div>
                                 <div class="line">
-                                    {% render_field p_form.city class="line__input" %}
+                                    {% render_field profile_form.city class="line__input" %}
                                     <span for="username" class="line__placeholder"> City  </span>
                                 </div>
                                 <div class="line">
-                                    {% render_field p_form.state class="line__input" %}
+                                    {% render_field profile_form.state class="line__input" %}
                                     <span for="username" class="line__placeholder"> State  </span>
                                 </div>
                                 <div class="line">
-                                    {% render_field p_form.country class="line__input" %}
+                                    {% render_field profile_form.country class="line__input" %}
                                     <span for="username" class="line__placeholder"> State  </span>
                                 </div>
                             </div>
@@ -154,11 +159,11 @@
                             <div class="lg:py-4 lg:px-20 flex-1 space-y-4 p-6">
                                 <h4><b>Socila URLs</b></h4>
                                 <div class="line">
-                                    {% render_field p_form.instagram class="line__input" %}
+                                    {% render_field profile_form.instagram class="line__input" %}
                                     <span for="username" class="line__placeholder"> Instagram   </span>
                                 </div>
                                 <div class="line">
-                                    {% render_field p_form.whatsApp class="line__input" %}
+                                    {% render_field profile_form.whatsApp class="line__input" %}
                                     <span for="username" class="line__placeholder"> WhatsApp  </span>
                                 </div>
                             </div>

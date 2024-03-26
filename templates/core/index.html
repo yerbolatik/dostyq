@@ -94,7 +94,7 @@
                         </div>
                     </div>
 
-                    <!-- post div-->
+                    <!-- Posts -->
                     <div class="post-div" id="post-list">
                         {% for post in posts %}
                         <div class="card lg:mx-0 uk-animation-slide-bottom-small mt-3 mb-3">
@@ -358,8 +358,8 @@
                         </div>
                         {% endfor %}
                     </div>
-                    <!-- post div end-->
 
+                    <!-- Load more-->
                     {% if posts.has_next %}
                     <div class="flex justify-center mt-6">
                         <a href="#" id="load-more-btn" class="bg-white dark:bg-gray-900 font-semibold my-3 px-6 py-2 rounded-full shadow-md dark:bg-gray-800 dark:text-white">
@@ -517,7 +517,11 @@
                                 });
                             });
                         </script>
+                    <!-- Load more End-->
+                    <!-- Posts End-->
 
+
+                
                 </div>
                 <div class="lg:w-72 w-full">
 

@@ -83,6 +83,53 @@ def my_profile(request):
 
 
 @login_required
+def profile_update(request):
+    print("Handling profile update request...")
+
+    if request.method == "POST":
+        profile_form = ProfileUpdateForm(
+            request.POST, request.FILES, instance=request.user.profile)
+        user_form = UserUpdateForm(request.POST, instance=request.user)
+
+        if profile_form.is_valid() and user_form.is_valid():
+            profile_form.save()
+            user_form.save()
+
+            messages.success(request, "Profile Updated Successfully.")
+            return redirect('userauths:profile-update')
+    else:
+        profile_form = ProfileUpdateForm(instance=request.user.profile)
+        user_form = UserUpdateForm(instance=request.user)
+
+        print("POST request received.")
+
+    context = {
+        'profile_form': profile_form,
+        'user_form': user_form,
+    }
+    return render(request, 'userauths/profile-update.html', context)
+
+
+@login_required
+def delete_user(request):
+    if request.method == 'POST':
+        confirm_delete = request.POST.get('confirm_delete')
+        if confirm_delete == 'True':
+            # Удалить профиль пользователя
+            user = request.user
+            user.delete()
+            messages.success(request, 'Your profile has been deleted.')
+            # Измените URL на тот, который вы хотите использовать после удаления профиля
+            return redirect('userauths:sign-up')
+        else:
+            # Вернуться на страницу обновления профиля, если пользователь нажал "Нет"
+            return redirect('userauths:profile-update')
+    else:
+        # Если запрос не POST, перенаправить на страницу обновления профиля
+        return render(request, 'userauths/delete-user.html')
+
+
+@login_required
 def friend_profile(request, username):
     profile = Profile.objects.get(user__username=username)
     if request.user.profile == profile:
@@ -113,31 +160,3 @@ def friend_profile(request, username):
         "bool_friend": bool_friend,
     }
     return render(request, "userauths/friend-profile.html", context)
-
-
-@login_required
-def profile_update(request):
-    print("Handling profile update request...")
-
-    if request.method == "POST":
-        p_form = ProfileUpdateForm(
-            request.POST, request.FILES, instance=request.user.profile)
-        u_form = UserUpdateForm(request.POST, instance=request.user)
-
-        if p_form.is_valid() and u_form.is_valid():
-            p_form.save()
-            u_form.save()
-
-            messages.success(request, "Profile Updated Successfully.")
-            return redirect('userauths:profile-update')
-    else:
-        p_form = ProfileUpdateForm(instance=request.user.profile)
-        u_form = UserUpdateForm(instance=request.user)
-
-        print("POST request received.")
-
-    context = {
-        'p_form': p_form,
-        'u_form': u_form,
-    }
-    return render(request, 'userauths/profile-update.html', context)
