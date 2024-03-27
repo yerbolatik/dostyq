@@ -14,4 +14,8 @@ urlpatterns = [
     path("profile-update/", views.profile_update, name="profile-update"),
     path("delete-user/", views.delete_user, name="delete-user"),
 
+
+    # Tabs
+    path("friends-tab/", views.friends_tab, name="friends-tab"),
+
 ]

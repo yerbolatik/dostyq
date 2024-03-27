@@ -9,7 +9,7 @@ from django.utils.text import slugify
 from django.utils.timesince import timesince
 from django.views.decorators.csrf import csrf_exempt
 
-from core.models import Post, Comment, ReplyComment, Friend, FriendRequest, Notification, ChatMessage
+from core.models import Post, Comment, ReplyComment, Friend, FriendRequest, Notification, ChatMessage, GroupChatMessage, GroupChat
 from userauths.models import User, Profile
 
 
@@ -427,6 +427,66 @@ def inbox_detail(request, username):
         "message_detail": message_detail,
     }
     return render(request, "chat/inbox_detail.html", context)
+
+
+@login_required
+def group_inbox(request):
+    groupchat = GroupChat.objects.filter(
+        members__in=User.objects.filter(pk=request.user.pk), active=True)
+    print("groupchat =============", groupchat)
+    context = {
+        'groupchat': groupchat,
+    }
+    return render(request, 'chat/group_inbox.html', context)
+
+
+@login_required
+def group_inbox_detail(request, slug):
+    groupchat_list = GroupChat.objects.filter(
+        members__in=User.objects.filter(pk=request.user.pk), active=True)
+    groupchat = GroupChat.objects.get(slug=slug, active=True)
+    group_messages = GroupChatMessage.objects.filter(
+        groupchat=groupchat).order_by("id")
+
+    if request.user not in groupchat.members.all():
+        return redirect("core:join_group_chat_page", groupchat.slug)
+
+    context = {
+        'groupchat': groupchat,
+        'group_name': groupchat.slug,
+        'group_messages': group_messages,
+        'groupchat_list': groupchat_list,
+    }
+    return render(request, 'chat/group_inbox_detail.html', context)
+
+
+def join_group_chat_page(request, slug):
+    groupchat = GroupChat.objects.get(slug=slug, active=True)
+
+    context = {
+        'groupchat': groupchat,
+    }
+    return render(request, 'chat/join_group_chat_page.html', context)
+
+
+def join_group_chat(request, slug):
+    groupchat = GroupChat.objects.get(slug=slug, active=True)
+
+    if request.user in groupchat.members.all():
+        return redirect("core:group_inbox_detail", groupchat.slug)
+
+    groupchat.members.add(request.user)
+    return redirect("core:group_inbox_detail", groupchat.slug)
+
+
+def leave_group_chat(request, slug):
+    groupchat = GroupChat.objects.get(slug=slug, active=True)
+
+    if request.user in groupchat.members.all():
+        groupchat.members.remove(request.user)
+        return redirect("core:join_group_chat_page", groupchat.slug)
+
+    return redirect("core:join_group_chat_page", groupchat.slug)
 
 
 def block_user(request):

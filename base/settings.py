@@ -161,7 +161,7 @@ LOGIN_URL = "userauths:sign-up"
 JAZZMIN_SETTINGS = {
     'site_header': "Dostyq",
     'site_brand': "Dos bolaiyq...",
-    'site_logo': "images/logo.png",
+    'site_logo': "/assets/images/logo.png",
     'copyright':  "All Right Reserved 2024",
     "welcome_sign": "Welcome to Dostyq Admin, Login Now.",
     "topmenu_links": [

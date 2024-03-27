@@ -12,6 +12,19 @@ urlpatterns = [
     path('core/inbox/', views.inbox, name='inbox'),
     path('core/inbox/<username>/', views.inbox_detail, name='inbox_detail'),
 
+    # Group Chat
+    path("core/group-inbox/", views.group_inbox, name="group_inbox"),
+    path("core/group-inbox/<slug:slug>/",
+         views.group_inbox_detail, name="group_inbox_detail"),
+
+    # Join & leave Group
+    path("core/join-group-page/<slug:slug>/",
+         views.join_group_chat_page, name="join_group_chat_page"),
+    path("core/join-group/<slug:slug>/",
+         views.join_group_chat, name="join_group"),
+    path("core/leave-group/<slug:slug>/",
+         views.leave_group_chat, name="leave_group_chat"),
+
     # Search
     path('search/', views.search_users, name='search_users'),
 

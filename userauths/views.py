@@ -160,3 +160,36 @@ def friend_profile(request, username):
         "bool_friend": bool_friend,
     }
     return render(request, "userauths/friend-profile.html", context)
+
+
+@login_required
+def friends_tab(request):
+    # Получить текущий URL
+    current_url = request.get_full_path()
+
+    # Проверить, является ли текущий URL страницей профиля пользователя
+    if "/user/my-profile/" in current_url:
+        # Если да, то перенаправить на вкладку "Друзья" в профиле пользователя
+        return redirect("userauths:my-profile") + "friends-tab/"
+
+    # Проверить, является ли текущий URL страницей профиля друга
+    elif "/user/profile/" in current_url:
+        # Если да, то извлечь имя пользователя из URL
+        username = current_url.split("/user/profile/")[1].split("/")[0]
+        # Перенаправить на вкладку "Друзья" в профиле друга
+        return redirect("userauths:friend-profile", username=username) + "friends-tab/"
+    else:
+        # Вернуться на главную страницу, если текущий URL не содержит информацию о профиле пользователя или друга
+        return redirect("core:feed")
+
+
+def photos_tab(request):
+    pass
+
+
+def pages_tab(request):
+    pass
+
+
+def groups_tab(request):
+    pass

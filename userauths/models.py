@@ -55,9 +55,9 @@ class Profile(models.Model):
         upload_to=user_directory_path, blank=True, null=True, default='default.jpg')
     full_name = models.CharField(max_length=200, null=True, blank=True)
     phone = models.CharField(max_length=200, null=True, blank=True)
-    gender = models.CharField(max_length=100, choices=GENDER, default='male')
+    gender = models.CharField(max_length=100, choices=GENDER, default='Male')
     relationship = models.CharField(
-        max_length=100, choices=RELATIONSHIP, default='single')
+        max_length=100, choices=RELATIONSHIP, default='Single')
     friends_visibility = models.CharField(
         max_length=100, choices=WHO_CAN_SEE_MY_FRIENDS, null=True, blank=True, default="Everyone")
     bio = models.CharField(max_length=200, null=True, blank=True)
