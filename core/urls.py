@@ -7,6 +7,9 @@ app_name = 'core'
 urlpatterns = [
     path('', views.index, name='feed'),
     path('post/<slug:slug>/', views.post_detail, name='post-detail'),
+    path('groups/', views.groups, name='groups'),
+    path('create-group/', views.create_group, name='create-group'),
+    path('group-index/<slug:slug>/', views.group_index, name='group-index'),
 
     # Chat
     path('core/inbox/', views.inbox, name='inbox'),
@@ -17,7 +20,7 @@ urlpatterns = [
     path("core/group-inbox/<slug:slug>/",
          views.group_inbox_detail, name="group_inbox_detail"),
 
-    # Join & leave Group
+    # Join & leave Group Chat
     path("core/join-group-page/<slug:slug>/",
          views.join_group_chat_page, name="join_group_chat_page"),
     path("core/join-group/<slug:slug>/",

@@ -224,7 +224,7 @@ class Notification(models.Model):
 class Group(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, related_name="group_user")
-    memebers = models.ManyToManyField(
+    members = models.ManyToManyField(
         User, blank=True, related_name="group_memebers")
 
     image = models.ImageField(

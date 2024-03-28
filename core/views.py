@@ -9,7 +9,8 @@ from django.utils.text import slugify
 from django.utils.timesince import timesince
 from django.views.decorators.csrf import csrf_exempt
 
-from core.models import Post, Comment, ReplyComment, Friend, FriendRequest, Notification, ChatMessage, GroupChatMessage, GroupChat
+from core.forms import GroupForm
+from core.models import Post, Comment, ReplyComment, Friend, FriendRequest, Notification, ChatMessage, GroupChatMessage, GroupChat, Group
 from userauths.models import User, Profile
 
 
@@ -36,13 +37,38 @@ def index(request):
     return render(request, 'core/index.html', context)
 
 
-@login_required
-def post_detail(request, slug):
-    post = Post.objects.get(slug=slug, active=True, visibility="Everyone")
+def groups(request):
+    groups = Group.objects.filter(
+        active=True, visibility="Everyone").order_by("-id")
+    max_members = max(groups, key=lambda group: group.members.all(
+    ).count()).members.all().count() if groups.exists() else 0
+
     context = {
-        "post": post
+        "groups": groups,
+        "max_members": max_members
     }
-    return render(request, 'core/post_detail.html', context)
+    return render(request, 'core/groups.html', context)
+
+
+def create_group(request):
+    if request.method == 'POST':
+        form = GroupForm(request.POST)
+        if form.is_valid():
+            group = form.save(commit=False)
+            group.user = request.user
+            group.save()
+            return redirect('core:groups', slug=group.slug)
+    else:
+        form = GroupForm()
+    return render(request, 'core/create-group.html', {'form': form})
+
+
+def group_index(request, slug):
+    group = Group.objects.get(slug=slug, active=True, visibility="Everyone")
+    context = {
+        "group": group
+    }
+    return render(request, 'core/group-index.html', context)
 
 
 def send_notification(user, sender, post, comment, notification_type):
@@ -78,6 +104,16 @@ def mark_as_read_all(request):
         return JsonResponse({"success": "All notifications marked as read."})
     else:
         return JsonResponse({"error": "Invalid request method."})
+
+
+# Post actions
+@login_required
+def post_detail(request, slug):
+    post = Post.objects.get(slug=slug, active=True, visibility="Everyone")
+    context = {
+        "post": post
+    }
+    return render(request, 'core/post_detail.html', context)
 
 
 @csrf_exempt
@@ -274,6 +310,7 @@ def delete_reply(request):
     return JsonResponse({"data": data})
 
 
+# Friends actions
 def add_friend(request):
     sender = request.user
     receiver_id = request.GET['id']
@@ -357,6 +394,26 @@ def reject_friend_request(request):
         "bool": True,
     }
     return JsonResponse({"data": data})
+
+
+def block_user(request):
+    id = request.GET['id']
+    user = request.user
+    friend = User.objects.get(id=id)
+
+    if user.id == friend.id:
+        return JsonResponse({"error": "You cannot block yourself"})
+
+    if friend in user.profile.friends.all():
+        user.profile.blocked.add(friend)
+        user.profile.friends.remove(friend)
+        friend.profile.friends.remove(user)
+    else:
+        return JsonResponse({"error": "You cannot block someone that is not your friend"})
+
+    return JsonResponse({"success": "User blocked"})
+
+# Messanger actions
 
 
 @login_required
@@ -487,24 +544,6 @@ def leave_group_chat(request, slug):
         return redirect("core:join_group_chat_page", groupchat.slug)
 
     return redirect("core:join_group_chat_page", groupchat.slug)
-
-
-def block_user(request):
-    id = request.GET['id']
-    user = request.user
-    friend = User.objects.get(id=id)
-
-    if user.id == friend.id:
-        return JsonResponse({"error": "You cannot block yourself"})
-
-    if friend in user.profile.friends.all():
-        user.profile.blocked.add(friend)
-        user.profile.friends.remove(friend)
-        friend.profile.friends.remove(user)
-    else:
-        return JsonResponse({"error": "You cannot block someone that is not your friend"})
-
-    return JsonResponse({"success": "User blocked"})
 
 
 def search_users(request):
