@@ -1,9 +1,10 @@
+from django.urls import reverse
 import shortuuid
 
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import OuterRef, Subquery, Q
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils.text import slugify
 from django.utils.timesince import timesince
@@ -53,11 +54,18 @@ def groups(request):
 def create_group(request):
     if request.method == 'POST':
         form = GroupForm(request.POST)
+
+        uuid_key = shortuuid.uuid()
+        uniqueid = uuid_key[:4]
+
         if form.is_valid():
+            name = request.POST.get("group-caption")
+            image = form.cleaned_data.get("group-thumbnail")
             group = form.save(commit=False)
             group.user = request.user
+            group.slug = slugify(name) + '-' + str(uniqueid.lower())
             group.save()
-            return redirect('core:groups', slug=group.slug)
+            return redirect('core:group-index', slug=group.slug)
     else:
         form = GroupForm()
     return render(request, 'core/create-group.html', {'form': form})
@@ -65,6 +73,20 @@ def create_group(request):
 
 def group_index(request, slug):
     group = Group.objects.get(slug=slug, active=True, visibility="Everyone")
+    context = {
+        "group": group
+    }
+    return render(request, 'core/group-index.html', context)
+
+
+def join_group(request, slug):
+    group = Group.objects.get(slug=slug, active=True, visibility="Everyone")
+    member = request.user
+
+    if request.method == "POST":
+        group.members.add(member)
+        return HttpResponseRedirect(reverse('core:group-index', args=[slug]))
+
     context = {
         "group": group
     }

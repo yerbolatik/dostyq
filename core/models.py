@@ -228,7 +228,7 @@ class Group(models.Model):
         User, blank=True, related_name="group_memebers")
 
     image = models.ImageField(
-        upload_to=user_directory_path, null=True, blank=True)
+        upload_to=user_directory_path, null=True, blank=True, default='noimage.gif')
     name = models.CharField(max_length=500, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     video = models.FileField(
@@ -246,7 +246,7 @@ class Group(models.Model):
         if self.name:
             return self.name
         else:
-            return self.username
+            return self.user.username
 
     class Meta:
         ordering = ["-date"]

@@ -10,6 +10,7 @@ urlpatterns = [
     path('groups/', views.groups, name='groups'),
     path('create-group/', views.create_group, name='create-group'),
     path('group-index/<slug:slug>/', views.group_index, name='group-index'),
+    path('join-group/<slug:slug>/', views.join_group, name='join-group'),
 
     # Chat
     path('core/inbox/', views.inbox, name='inbox'),
