@@ -37,13 +37,13 @@
                         {% csrf_token %}
                         <div class="p-10 space-y-7">
                             <div class="line">
-                                <input class="line__input" id="id_name" name="group-caption" type="text" onkeyup="this.setAttribute('value', this.value);" value="" autocomplete="off">
+                                <input class="line__input" id="group-caption" name="group-caption" type="text" onkeyup="this.setAttribute('value', this.value);" value="" autocomplete="off">
                                 <span for="username" class="line__placeholder"> Group Name </span>
                             </div>
 
                             
                             <div class="line h-32"> 
-                                <textarea class="line__input h-32"  id="group-thumbnail" name="description" type="text" onkeyup="this.setAttribute('value', this.value);" value="" autocomplete="off"></textarea>
+                                <textarea class="line__input h-32"  id="group-description" name="group-description" type="text" onkeyup="this.setAttribute('value', this.value);" value="" autocomplete="off"></textarea>
                                 <span for="username" class="line__placeholder"> Group description </span> 
                             </div>
 
@@ -52,13 +52,13 @@
                                 <div class="bg-gray-100 p-4  flex items-center" style="border-radius: 10px;">
                                     <div class="relative">
                                         <img src="{% static 'assets/images/group/noimage.gif' %}" id="preview_avatar" alt="Group Image" class="w-24 h-24 rounded-full">
-                                        <label for="id_image" class="absolute bottom-0 right-0 p-2 bg-white rounded-full cursor-pointer">
+                                        <label for="group-thumbnail" class="absolute bottom-0 right-0 p-2 bg-white rounded-full cursor-pointer">
                                             <i class="fas fa-pen text-blue-500"></i>
                                         </label>
                                     </div>
                                 </div>
 
-                                <input type="file" name="image" id="id_image" onchange="loadFile(event)" style="display: none;">
+                                <input type="file" name="group-thumbnail" id="group-thumbnail" onchange="loadFile(event)" style="display: none;">
                                 <script>
                                     var loadFile = function (event) {
                                       var output2 = document.getElementById("preview_avatar");
@@ -73,9 +73,9 @@
                             
 
                             <div class="px-2 space-y-2">
-                                <label for="id_visibility" class="font-semibold text-base"> Choose Privacy </label> 
+                                <label for="group-visibility" class="font-semibold text-base"> Choose Privacy </label> 
                                 <div> Anyone can see who's in the group and what they post. </div>
-                                <select class="selectpicker mt-2 story" id="visibility" name="visibility">
+                                <select class="selectpicker mt-2 story" id="group-visibility" name="group-visibility">
                                     <option value="Everyone">Everyone</option>
                                     <option value="Only me">Only me</option>
                                 </select>

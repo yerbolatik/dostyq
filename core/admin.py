@@ -56,7 +56,7 @@ class NotificationAdmin(admin.ModelAdmin):
 
 
 class GroupAdmin(admin.ModelAdmin):
-    list_editable = ['user', 'name', 'visibility']
+    list_editable = ['name', 'visibility']
     list_display = ['thumbnail', 'user', 'name', 'visibility']
     prepopulated_fields = {"slug": ('name',)}
 

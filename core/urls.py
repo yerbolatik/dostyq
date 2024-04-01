@@ -61,4 +61,7 @@ urlpatterns = [
     path('update-notification/', views.update_notification_status,
          name='update-notification'),
     path('mark-as-read-all/', views.mark_as_read_all, name='mark-as-read-all'),
+
+    path('create-group-post/', views.create_group_post, name='create-group-post'),
+
 ]
