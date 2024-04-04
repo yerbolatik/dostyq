@@ -7790,11 +7790,11 @@ header .header_inner .right_side {
 }
 
 .profile .profiles_banner {
-    width: 100%;
     position: relative;
     padding: 0;
     overflow: hidden;
     border-radius: 12px 12px 0 0;
+    max-width: 100%;
     height: 250px;
 }
 
@@ -7819,7 +7819,7 @@ header .header_inner .right_side {
     height: 100%;
     position: absolute;
     -o-object-fit: cover;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .profile .profiles_content {
@@ -7902,7 +7902,10 @@ header .header_inner .right_side {
     font-weight: 600;
     font-size: 26px;
     margin-bottom: 0;
+    margin-right: 5px;
 }
+
+
 
 .profile .profiles_content .profile_info p {
     margin-bottom: 0px;
@@ -8003,7 +8006,13 @@ header .header_inner .right_side {
     }
     .profile .profiles_content .profile_info {
         text-align: center;
+        display: flex;
+        align-items: center;
         padding-bottom: 10px;
+    }
+    .profile .profiles_content .profile_info i.fa-circle-check {
+        font-size: 0.5em; /* Измените размер значка по вашему усмотрению */
+        margin-left: 5px;
     }
     .profile .profiles_content .profile_info h1 {
         margin-bottom: 3px !important;
@@ -8027,6 +8036,7 @@ header .header_inner .right_side {
         -webkit-box-shadow: none;
         box-shadow: none;
     }
+    
 }
 
 /* ---------------------------------- */

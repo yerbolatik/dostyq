@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 
-from core.models import Post, FriendRequest
+from core.models import Group, Post, FriendRequest
 from userauths.forms import UserRegisterForm, ProfileUpdateForm, UserUpdateForm
 from userauths.models import Profile, User
 
@@ -74,10 +74,13 @@ def LogoutView(request):
 def my_profile(request):
     profile = request.user.profile
     posts = Post.objects.filter(active=True, user=request.user).order_by("-id")
+    groups = Group.objects.filter(
+        active=True).order_by("-id")
 
     context = {
         "profile": profile,
         "posts": posts,
+        "groups": groups,
     }
     return render(request, "userauths/my-profile.html", context)
 

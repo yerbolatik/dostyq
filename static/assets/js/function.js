@@ -501,8 +501,8 @@ $(document).ready(function() {
         e.preventDefault();
     
         let post_caption = $("#group-post-caption").val();
-        let post_visibility = $("#group-visibility").val();
-        let group_id = $(this).attr("group-id")
+        let post_visibility = $("#group-post-visibility").val();
+        let group_id = $("#group_id").val()
     
         let fileInput = $('#group-post-thumbnail')[0];
         let file = fileInput.files[0];
@@ -512,12 +512,13 @@ $(document).ready(function() {
         console.log(post_visibility);
         console.log(fileName);
         console.log(file);
+        console.log(group_id);
     
         let formData = new FormData();
         formData.append('group-post-caption', post_caption);
         formData.append('group-post-visibility', post_visibility);
         formData.append('group-post-thumbnail', file, fileName);
-        formData.append('group-id', group_id);
+        formData.append('group_id', group_id);
     
         $.ajax({
         url: '/create-group-post/',

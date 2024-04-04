@@ -1,5 +1,5 @@
-from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_save
 from django.utils.text import slugify
 from PIL import Image
@@ -85,12 +85,23 @@ class Profile(models.Model):
     blocked = models.ManyToManyField(
         User, blank=True, related_name='blocked')
 
+    groups = models.ManyToManyField(
+        "core.Group", blank=True, related_name="groups")
+    pages = models.ManyToManyField(
+        "core.Page", blank=True, related_name="pages")
+
     date = models.DateTimeField(auto_now_add=True)
 
     slug = models.SlugField(unique=True, blank=True, null=True)
 
+    class Meta:
+        ordering = ["-date"]
+
     def __str__(self):
-        return self.user.username
+        if self.full_name:
+            return str(self.full_name)
+        else:
+            return str(self.user.username)
 
     def save(self, *args, **kwargs):
         if self.slug == "" or self.slug == None:

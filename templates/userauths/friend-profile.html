@@ -27,7 +27,7 @@
                         </div>
 
                         <div class="profile_info">
-                            <h1> {{ profile.full_name }} </h1>
+                            <h1> {{ profile.full_name }} {% if profile.verified %} <small><i class="fas fa-circle-check" title="Verified Account"></i></small> {% endif %}</h1>
                             {% if profile.bio %}
                             <p class="text-center"> {{ profile.bio }}</p>
                             {% endif %}

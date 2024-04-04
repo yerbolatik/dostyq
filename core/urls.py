@@ -11,6 +11,7 @@ urlpatterns = [
     path('create-group/', views.create_group, name='create-group'),
     path('group-index/<slug:slug>/', views.group_index, name='group-index'),
     path('join-group/<slug:slug>/', views.join_group, name='join-group'),
+    path('photos/', views.photos, name='photos'),
 
     # Chat
     path('core/inbox/', views.inbox, name='inbox'),
@@ -33,9 +34,9 @@ urlpatterns = [
     path('search/', views.search_users, name='search_users'),
 
     # Games
-    path("core/all-games/", views.games, name="games"),
-    path("core/stack_brick/", views.stack_brick, name="stack_brick"),
-    path("core/snake/", views.snake, name="snake"),
+    path("all-games/", views.games, name="games"),
+    path("stack_brick/", views.stack_brick, name="stack_brick"),
+    path("snake/", views.snake, name="snake"),
 
     # Load more post
     path('load_more_posts/', views.load_more_posts, name='load_more_posts'),

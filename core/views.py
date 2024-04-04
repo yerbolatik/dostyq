@@ -9,6 +9,7 @@ from django.shortcuts import redirect, render
 from django.utils.text import slugify
 from django.utils.timesince import timesince
 from django.views.decorators.csrf import csrf_exempt
+from itertools import chain
 
 from core.forms import GroupForm
 from core.models import GroupPost, Post, Comment, ReplyComment, Friend, FriendRequest, Notification, ChatMessage, GroupChatMessage, GroupChat, Group
@@ -117,13 +118,27 @@ def create_post(request):
 
 # Group Functions
 def groups(request):
-    groups = Group.objects.filter(
-        active=True, visibility="Everyone").order_by("-id")
-    max_members = max(groups, key=lambda group: group.members.all(
-    ).count()).members.all().count() if groups.exists() else 0
+    user = request.user
+    user_groups = Group.objects.filter(members=user)
+
+    if user_groups.exists():
+        only_me_groups = user_groups.filter(visibility="Only me")
+        everyone_groups = user_groups.filter(visibility="Everyone")
+        all_everyone_groups = Group.objects.filter(
+            active=True, visibility="Everyone")
+        groups = list(
+            chain(only_me_groups, everyone_groups, all_everyone_groups))
+    else:
+        groups = Group.objects.filter(
+            active=True, visibility="Everyone").order_by("-id")
+
+    unique_groups = set(groups)
+
+    max_members = max(unique_groups, key=lambda group: group.members.all(
+    ).count()).members.all().count() if unique_groups else 0
 
     context = {
-        "groups": groups,
+        "groups": unique_groups,
         "max_members": max_members
     }
     return render(request, 'core/groups.html', context)
@@ -177,13 +192,14 @@ def group_index(request, slug):
 def create_group_post(request):
     if request.method == "POST":
         group_id = request.POST.get("group_id")
-        group = Group.objects.get(id=group_id)
         title = request.POST.get("group-post-caption")
         visibility = request.POST.get("group-post-visibility")
         image = request.FILES.get("group-post-thumbnail")
 
         uuid_key = shortuuid.uuid()
         uniqueid = uuid_key[:4]
+
+        group = Group.objects.get(id=group_id)
 
         if title and image:
             group_post = GroupPost(
@@ -721,3 +737,17 @@ def load_more_posts(request):
         posts_data.append(post_data)
 
     return JsonResponse({'posts': posts_data})
+
+
+def photos(request):
+    photos = Post.objects.filter(
+        active=True, visibility="Everyone").order_by("-id")
+    posts = Post.objects.filter(
+        active=True, visibility="Everyone").order_by("-id")
+
+    context = {
+        "photos": photos,
+        "posts": posts,
+
+    }
+    return render(request, 'core/photos.html', context)

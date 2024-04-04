@@ -1,0 +1,58 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- Main Contents -->
+<div class="main_content">
+    <div class="mcontainer">
+
+
+        <div class="flex justify-between items-center relative md:mb-4 mb-3">
+            <div class="flex-1">
+                <h2 class="text-2xl font-semibold"> Photos </h2>
+                <nav class="responsive-nav border-b md:m-0 -mx-4">
+                    <ul>
+                        <li class="active"><a href="#" class="lg:px-2">  Photos of you </a></li>
+                        <li><a href="#" class="lg:px-2"> Recently added </a></li>
+                        <li><a href="#" class="lg:px-2"> Family </a></li>
+                        <li><a href="#" class="lg:px-2"> University </a></li>
+                        <li><a href="#" class="lg:px-2"> Albums </a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-4 grid-cols-2 gap-3 mt-5">
+            {% for post in posts %}
+                {% if post.image %}
+                    <div>
+                        <div class="bg-green-400 max-w-full lg:h-56 h-48 rounded-lg relative overflow-hidden shadow uk-transition-toggle">
+                            <img src="{{ post.image.url }}" class="w-full h-full absolute object-cover inset-0">
+                            <!-- overly-->
+                            <div class="-bottom-12 absolute bg-gradient-to-b from-transparent h-1/2 to-gray-800 uk-transition-slide-bottom-small w-full"></div>
+                            <div class="absolute bottom-0 w-full p-3 text-white uk-transition-slide-bottom-small flex items-center">
+                                <div class="flex-1">
+                                    <div class="text-lg"> {{ post.title }} </div>
+                                    <div class="flex space-x-3 lg:flex-initial text-sm">
+                                        <a href="#">  Like</a>
+                                        <a href="#">  Comment </a>
+                                        <a href="#">  Share </a>
+                                    </div>
+                                </div>
+                                <a href="{{ post.image.url }}" download="{{ post.image.url }}" class="btn-down text-2xl uil-cloud-download px-1"></a>
+                                
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            
+        </div>
+
+
+    </div>
+</div>
+
+</div>
+{% endblock content %}

@@ -34,60 +34,62 @@
                     <div class="uk-slider-container px-1 py-3">
                         <ul class="uk-slider-items uk-child-width-1-4@m uk-child-width-1-3@s uk-grid-small uk-grid">
                             {% for group in groups %}
-                                <li>
-                                    <div class="card">
-                                        <div class="card-media h-28">
-                                            <div class="card-media-overly"></div>
-                                            <img src="{{ group.image.url }}" style="width: 240px; height: 120px;" alt="" class="">
-                                            {% if group.members.all.count == max_members %}
-                                                <div class="absolute bg-red-100 font-semibold px-2.5 py-1 rounded-lg text-red-500 text-xs top-2.5 left-2.5"> Trend </div>
-                                            {% endif %}
-                                        </div>
-                                        <div class="card-body">
-                                            <a href="{% url "core:group-index" group.slug%}" class="font-semibold text-lg truncate"> {{ group.name }} </a>
-                                            <div class="flex items-center flex-wrap space-x-1 mt-1 text-sm text-gray-500 capitalize">
-                                                <span> {{ group.members.count }} members </span>
-                                                <span> 1.7k post a day </span>
-                                            </div>
-
-                                            <div class="flex mt-3.5 space-x-2">
-                                                {% if group.members.all.count > 0 %}
-                                                    <div class="flex items-center -space-x-2 -mt-1">
-                                                        {% for icon in group.members.all|slice:"2" %}
-                                                        <img alt="Image placeholder" src="{{ icon.profile.image.url }}" class="border-2 border-white rounded-full w-7">
-                                                        {% endfor %}
-                                                    </div>
-                                                    <div class="flex-1 leading-5 text-sm">
-                                                        {% if group.members.all|length|add:"-1" == 0 %} 
-                                                            <div><strong>{{ group.members.first }}</strong> is member </div>
-                                                        {% elif group.members.all|length|add:"-1" == 1 %} 
-                                                            <div><strong>{{ group.members.first }}</strong> and {{ group.members.all|length|add:"-1" }} freind are members  </div>
-                                                        {% else %}
-                                                            <div> <strong>{{ group.members.first }}</strong> and {{ group.members.all|length|add:"-1" }} freinds are members </div>
-                                                        {% endif %}
-                                                    </div>
+                                {% if request.user not in group.members.all %}
+                                    <li>
+                                        <div class="card">
+                                            <div class="card-media h-28">
+                                                <div class="card-media-overly"></div>
+                                                <img src="{{ group.image.url }}" style="width: 240px; height: 120px;" alt="" class="">
+                                                {% if group.members.all.count == max_members %}
+                                                    <div class="absolute bg-red-100 font-semibold px-2.5 py-1 rounded-lg text-red-500 text-xs top-2.5 left-2.5"> Trend </div>
                                                 {% endif %}
                                             </div>
+                                            <div class="card-body">
+                                                <a href="{% url "core:group-index" group.slug%}" class="font-semibold text-lg truncate"> {{ group.name }} </a>
+                                                <div class="flex items-center flex-wrap space-x-1 mt-1 text-sm text-gray-500 capitalize">
+                                                    <span> {{ group.members.count }} members </span>
+                                                    <span> 1.7k post a day </span>
+                                                </div>
 
-                                            <form method="POST" action="{% url 'core:join-group' group.slug %}">
-                                                {% csrf_token %}
-                                                <div class="flex mt-3.5 space-x-2 text-sm font-medium">
-                                                        {% if request.user not in group.members.all %}
-                                                        <button type="submit" class="bg-blue-600 flex flex-1 h-8 items-center justify-center rounded-md text-white capitalize"> 
-                                                            Join 
-                                                        </button>
-                                                        {% endif %}
-                                                        <a href="{% url "core:group-index" group.slug %}" class="bg-gray-200 flex flex-1 h-8 items-center justify-center rounded-md capitalize"> 
-                                                            View 
-                                                        </a>
-                                                    </div>
-                                                </form>
+                                                <div class="flex mt-3.5 space-x-2">
+                                                    {% if group.members.all.count > 0 %}
+                                                        <div class="flex items-center -space-x-2 -mt-1">
+                                                            {% for icon in group.members.all|slice:"2" %}
+                                                            <img alt="Image placeholder" src="{{ icon.profile.image.url }}" class="border-2 border-white rounded-full w-7">
+                                                            {% endfor %}
+                                                        </div>
+                                                        <div class="flex-1 leading-5 text-sm">
+                                                            {% if group.members.all|length|add:"-1" == 0 %} 
+                                                                <div><strong>{{ group.members.first }}</strong> is member </div>
+                                                            {% elif group.members.all|length|add:"-1" == 1 %} 
+                                                                <div><strong>{{ group.members.first }}</strong> and {{ group.members.all|length|add:"-1" }} freind are members  </div>
+                                                            {% else %}
+                                                                <div> <strong>{{ group.members.first }}</strong> and {{ group.members.all|length|add:"-1" }} freinds are members </div>
+                                                            {% endif %}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+
+                                                <form method="POST" action="{% url 'core:join-group' group.slug %}">
+                                                    {% csrf_token %}
+                                                    <div class="flex mt-3.5 space-x-2 text-sm font-medium">
+                                                            {% if request.user not in group.members.all %}
+                                                            <button type="submit" class="bg-blue-600 flex flex-1 h-8 items-center justify-center rounded-md text-white capitalize"> 
+                                                                Join 
+                                                            </button>
+                                                            {% endif %}
+                                                            <a href="{% url "core:group-index" group.slug %}" class="bg-gray-200 flex flex-1 h-8 items-center justify-center rounded-md capitalize"> 
+                                                                View 
+                                                            </a>
+                                                        </div>
+                                                    </form>
 
 
 
+                                            </div>
                                         </div>
-                                    </div>
-                                </li>
+                                    </li>
+                                {% endif %}
                             {% endfor %}
                         </ul>
 
@@ -108,7 +110,7 @@
                     <h3 class="text-xl font-semibold"> Your Groups </h3>
                     <nav class="responsive-nav border-b">
                         <ul>
-                            <li class="active"><a href="#" class="lg:px-2"> All Groups <span> {{ groups.count }} </span> </a></li>
+                            <li class="active"><a href="#" class="lg:px-2"> All Groups </a></li>
                             <li><a href="#" class="lg:px-2"> Recently added </a></li>
                             <li><a href="#" class="lg:px-2"> Family </a></li>
                             <li><a href="#" class="lg:px-2"> University </a></li>
