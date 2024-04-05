@@ -258,6 +258,7 @@ def create_group_post(request):
     return JsonResponse({"data": "sent"})
 
 
+@csrf_exempt
 def join_group(request, slug):
     group = Group.objects.get(slug=slug, active=True, visibility="Everyone")
     member = request.user
@@ -270,6 +271,21 @@ def join_group(request, slug):
         "group": group
     }
     return render(request, 'core/group-index.html', context)
+
+
+@csrf_exempt
+def unfollow_group(request, slug):
+    group = Group.objects.get(slug=slug, active=True)
+    member = request.user
+
+    if request.method == "POST":
+        group.members.remove(member)
+        return JsonResponse({"success": True})
+
+    context = {
+        "group": group
+    }
+    return render(request, 'core/groups.html', context)
 
 
 def send_notification(user, sender, post, comment, notification_type):

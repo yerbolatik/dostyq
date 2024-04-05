@@ -48,7 +48,7 @@
                                 <li id="friends-tab" data-friends-tab="friends-tab" class=""><a href="#">Friends <span>{{ profile.friends.all.count }}</span> </a></li>
                                 <li><a href="#">Photos <span>{{posts.count}}</span> </a></li>
                                 <li><a href="#">Pages</a></li>
-                                <li><a href="#">Groups {{profile.groups.all.count}}</a></li>
+                                <li><a href="#">Groups</a></li>
                             </ul>
                         </nav>
 
@@ -156,19 +156,21 @@
                                 <div class="pt-3 px-1">
                                     <a href="{% url "userauths:profile" friend.profile.user %}" class="text-base font-semibold mb-0.5">  {{ friend.profile.full_name }} </a>
                                     <p class="font-medium text-sm">{{ friend.profile.friends.all.count }} Friend(s) </p>
-                                    <button class="bg-blue-100 w-full flex font-semibold h-8 items-center justify-center mt-3 px-3 rounded-md text-blue-600 text-sm mb-1">
-                                        Add Friend
-                                    </button>
+                                    <div class="flex mt-3.5 space-x-2 text-sm font-medium">
+                                        <a href="{% url "userauths:profile" friend.profile.user %}" class="bg-gray-200 flex flex-1 h-8 items-center justify-center rounded-md capitalize"> 
+                                            View 
+                                        </a>
+                                        {% if friend in profile.friends.all %}
+                                        <button id="unfriend" data-unfriend="{{ friend.profile.user.id }}" href="#" class="bg-red-600 flex flex-1 h-8 items-center justify-center rounded-md text-white capitalize unfriend{{ profile.user.id }}"> 
+                                            Remove 
+                                        </button>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                             {% endfor %}
                             
 
-                        </div>
-
-                        <div class="flex justify-center mt-6">
-                            <a href="#" class="bg-white font-semibold my-3 px-6 py-2 rounded-full shadow-md dark:bg-gray-800 dark:text-white">
-                                Load more ..</a>
                         </div>
 
                     </div>
@@ -209,10 +211,6 @@
                             
                         </div>
 
-                        <div class="flex justify-center mt-6">
-                            <a href="#" class="bg-white dark:bg-gray-900 font-semibold my-3 px-6 py-2 rounded-full shadow-md dark:bg-gray-800 dark:text-white">
-                                Load more ..</a>
-                        </div>
 
                     </div>
 
@@ -246,11 +244,6 @@
 
                         </div>
 
-                        <div class="flex justify-center mt-6">
-                            <a href="#" class="bg-white font-semibold my-3 px-6 py-2 rounded-full shadow-md dark:bg-gray-800 dark:text-white">
-                                Load more ..</a>
-                        </div>
-
                     </div>
 
                     <!-- Groups  -->
@@ -261,13 +254,13 @@
                                 <h2 class="text-xl font-bold"> Groups </h2>
                                 <nav class="responsive-nav style-2 md:m-0 -mx-4">
                                     <ul uk-switcher="connect: #groups-tab; animation: uk-animation-fade">
-                                        <li class="active"><a href="#"> Joined </a></li>
+                                        <li><a href="#"> Joined </a></li>
                                         <li><a href="#"> My Groups </a></li>
                                         <li><a href="#"> Discover </a></li>
                                     </ul>
                                 </nav>
                             </div>
-                            <a href="create-group.html" data-tippy-placement="left" data-tippy="" data-original-title="Create New Album" class="bg-blue-100 font-semibold py-2 px-6 rounded-md text-sm md:mt-0 mt-3 text-blue-600">
+                            <a href="{% url "core:create-group" %}" data-tippy-placement="left" data-tippy="" data-original-title="Create New Album" class="bg-blue-100 font-semibold py-2 px-6 rounded-md text-sm md:mt-0 mt-3 text-blue-600">
                                 Create       
                             </a>
                         </div>
@@ -285,16 +278,12 @@
                                                     <a href="{% url "core:group-index" group.slug%}" class="text-base font-semibold capitalize">{{ group.name }} </a>
                                                     <div class="text-sm text-gray-500"> {{ group.members.all.count }} Members </div>
                                                 </div>
-                                                <button class="bg-gray-100 font-semibold py-2 px-3 rounded-md text-sm md:mt-0 mt-3">
-                                                    Follow  
+                                                <button href="{% url 'core:unfollow-group' group.slug %}" class="unfollow-group-btn bg-gray-100 font-semibold py-2 px-3 rounded-md text-sm md:mt-0 mt-3">
+                                                    Unfollow  
                                                 </button>
                                             </div>
                                         {% endif %}
                                     {% endfor %}
-                                    <div class="flex justify-center mt-6">
-                                        <a href="#" class="bg-white dark:bg-gray-900 font-semibold my-3 px-6 py-2 rounded-full shadow-md dark:bg-gray-800 dark:text-white">
-                                            Load more ..</a>
-                                    </div>
                                 </div>
 
                             <!--My Groups-->
@@ -309,22 +298,16 @@
                                                     <a href="{% url "core:group-index" group.slug%}" class="text-base font-semibold capitalize">{{ group.name }} </a>
                                                     <div class="text-sm text-gray-500"> {{ group.members.all.count }} Members </div>
                                                 </div>
-                                                <button class="bg-gray-100 font-semibold py-2 px-3 rounded-md text-sm md:mt-0 mt-3">
-                                                    Follow  
-                                                </button>
                                             </div>
                                         {% endif %}
                                     {% endfor %}
-                                    <div class="flex justify-center mt-6">
-                                        <a href="#" class="bg-white dark:bg-gray-900 font-semibold my-3 px-6 py-2 rounded-full shadow-md dark:bg-gray-800 dark:text-white">
-                                            Load more ..</a>
-                                    </div>
                                 </div>
 
                             <!--Discover-->
                                 <div class="grid md:grid-cols-2  grid-cols-2 gap-x-2 gap-y-4 mt-3">
+                                    
                                     {% for group in groups %}
-                                        {% if request.user not in group.members.all %}
+                                        {% if request.user not in group.members.all and group.visibility == "Everyone"%}
                                             <div class="flex items-center flex-col md:flex-row justify-center p-4 rounded-md shadow hover:shadow-md md:space-x-4">
                                                 <a href="{% url "core:group-index" group.slug%}" iv="" class="w-16 h-16 flex-shrink-0 overflow-hidden rounded-full relative">
                                                     <img src="{{ group.image.url }}" class="absolute w-full h-full inset-0 " alt="">
@@ -333,16 +316,15 @@
                                                     <a href="{% url "core:group-index" group.slug%}" class="text-base font-semibold capitalize">{{ group.name }} </a>
                                                     <div class="text-sm text-gray-500"> {{ group.members.all.count }} Members </div>
                                                 </div>
-                                                <button class="bg-gray-100 font-semibold py-2 px-3 rounded-md text-sm md:mt-0 mt-3">
-                                                    Follow  
-                                                </button>
+                                                <form method="POST" action="{% url 'core:join-group' group.slug %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="bg-gray-100 font-semibold py-2 px-3 rounded-md text-sm md:mt-0 mt-3">
+                                                        Follow  
+                                                    </button>
+                                                </form>
                                             </div>
                                         {% endif %}
                                     {% endfor %}
-                                    <div class="flex justify-center mt-6">
-                                        <a href="#" class="bg-white dark:bg-gray-900 font-semibold my-3 px-6 py-2 rounded-full shadow-md dark:bg-gray-800 dark:text-white">
-                                            Load more ..</a>
-                                    </div>
                                 </div>
 
 

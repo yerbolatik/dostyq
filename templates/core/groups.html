@@ -73,16 +73,16 @@
                                                 <form method="POST" action="{% url 'core:join-group' group.slug %}">
                                                     {% csrf_token %}
                                                     <div class="flex mt-3.5 space-x-2 text-sm font-medium">
-                                                            {% if request.user not in group.members.all %}
-                                                            <button type="submit" class="bg-blue-600 flex flex-1 h-8 items-center justify-center rounded-md text-white capitalize"> 
-                                                                Join 
-                                                            </button>
-                                                            {% endif %}
-                                                            <a href="{% url "core:group-index" group.slug %}" class="bg-gray-200 flex flex-1 h-8 items-center justify-center rounded-md capitalize"> 
-                                                                View 
-                                                            </a>
-                                                        </div>
-                                                    </form>
+                                                        {% if request.user not in group.members.all %}
+                                                        <button type="submit" class="bg-blue-600 flex flex-1 h-8 items-center justify-center rounded-md text-white capitalize"> 
+                                                            Join 
+                                                        </button>
+                                                        {% endif %}
+                                                        <a href="{% url "core:group-index" group.slug %}" class="bg-gray-200 flex flex-1 h-8 items-center justify-center rounded-md capitalize"> 
+                                                            View 
+                                                        </a>
+                                                    </div>
+                                                </form>
 
 
 

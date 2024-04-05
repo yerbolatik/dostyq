@@ -495,6 +495,21 @@ $(document).ready(function() {
         });
     });
 
+
+    // Unfollow Group
+    $('.unfollow-group-btn').click(function(e) {
+        e.preventDefault();
+
+        // Получаем URL для отправки POST-запроса из атрибута href кнопки
+        var url = $(this).attr('href');
+
+        // Делаем POST запрос на unfollow-group
+        $.post(url, function(data) {
+            // Перезагружаем текущую страницу после успешного выполнения unfollow-group
+            location.reload();
+        });
+    });
+
     
     // Group Post
     $('#group-post-form').submit(function(e) {

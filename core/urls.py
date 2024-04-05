@@ -11,6 +11,8 @@ urlpatterns = [
     path('create-group/', views.create_group, name='create-group'),
     path('group-index/<slug:slug>/', views.group_index, name='group-index'),
     path('join-group/<slug:slug>/', views.join_group, name='join-group'),
+    path('unfollow-group/<slug:slug>/',
+         views.unfollow_group, name='unfollow-group'),
     path('photos/', views.photos, name='photos'),
 
     # Chat
