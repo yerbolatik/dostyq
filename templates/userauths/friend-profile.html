@@ -40,10 +40,9 @@
                             <ul uk-switcher="connect: #timeline-tab; animation: uk-animation-fade">
                                 <li><a href="#">Timeline</a></li>
                                 <li><a href="#">Friends <span>{{ profile.friends.all.count }}</span> </a></li>
-                                <li><a href="#">Photoes </a></li>
+                                <li><a href="#">Photos </a></li>
                                 <li><a href="#">Pages</a></li>
                                 <li><a href="#">Groups</a></li>
-                                <li><a href="#">Videos</a></li>
                             </ul>
                         </nav>
 
@@ -153,7 +152,7 @@
                                             </a>
                                         </div>
                                     </div>
-                                    {% else %}
+                                {% else %}
                                     <div class="card p-2">
                                         <a href="{% url "userauths:profile" friend.profile.user %}">
                                             <img src="{{ friend.profile.image.url }}" class="h-36 object-cover rounded-md shadow-sm w-full">
@@ -161,19 +160,40 @@
                                         <div class="pt-3 px-1">
                                             <a href="{% url "userauths:profile" friend.profile.user %}" class="text-base font-semibold mb-0.5">  {{ friend.profile.full_name }} </a>
                                             <p class="font-medium text-sm">{{ friend.profile.friends.all.count }} Friend(s) </p>
-                                            {% if profile.user in request.user.profile.friends.all %}
+
+
+                                            {% if request.user in friend.profile.friends.all %}
+                                                <a href="{% url "userauths:profile" friend.profile.user %}" class="bg-gray-200 w-full flex font-semibold h-8 items-center justify-center mt-3 px-3 rounded-md capitalize"> 
+                                                    <span id="unfriend-text">View </span>
+                                                </a>
+                                            {% else %}
                                                 {% if bool == True %}
-                                                <button id="add-friend" data-friend-id="{{ profile.user.id }}" href="#" class="bg-red-600 w-full flex font-semibold h-8 items-center justify-center mt-3 px-3 rounded-md text-white text-sm mb-1 add-friend{{ profile.user.id }}">
-                                                    <span id="friend-text">Cancel Request </span>
-                                                </button>
+                                                    <a id="add-friend" data-friend-id="{{ profile.user.id }}" href="#" class="w-full flex items-center justify-center h-8 mt-3 px-3 rounded-md bg-red-600 text-white hover:text-white add-friend{{ profile.user.id }}"> 
+                                                        <span id="friend-text"> Cancel Request </span>
+                                                    </a>
+                                                    
+                                                    {% else %}
+                                                    <a id="add-friend" data-friend-id="{{ profile.user.id }}" href="#" class="w-full flex items-center justify-center h-8 mt-3 px-3 rounded-md bg-blue-600 text-white hover:text-white add-friend{{ profile.user.id }}"> 
+                                                        <span id="friend-text"><i class="fas fa-user-plus"></i> Add Friend </span>
+                                                    </a>
+                                                {% endif %}
+                                            {% endif %}
+
+
+
+                                            {% comment %} {% if profile.user in request.user.profile.friends.all %}
+                                                {% if bool == True %}
+                                                    <button id="add-friend" data-friend-id="{{ profile.user.id }}" href="#" class="bg-red-600 w-full flex font-semibold h-8 items-center justify-center mt-3 px-3 rounded-md text-white text-sm mb-1 add-friend{{ profile.user.id }}">
+                                                        <span id="friend-text">Cancel Request </span>
+                                                    </button>
                                                 
                                                 {% else %}
-                                                <button id="add-friend" data-friend-id="{{ profile.user.id }}" href="#" class="bg-blue-100 w-full flex font-semibold h-8 items-center justify-center mt-3 px-3 rounded-md text-blue-600 text-sm mb-1 add-friend{{ profile.user.id }}">
-                                                    <span id="friend-text"><i class="fas fa-user-plus"></i> Add Friend </span>
-                                                </button>
-                                            {% endif %}
+                                                    <button id="add-friend" data-friend-id="{{ profile.user.id }}" href="#" class="bg-blue-100 w-full flex font-semibold h-8 items-center justify-center mt-3 px-3 rounded-md text-blue-600 text-sm mb-1 add-friend{{ profile.user.id }}">
+                                                        <span id="friend-text"><i class="fas fa-user-plus"></i> Add Friend </span>
+                                                    </button>
+                                                {% endif %}
+                                            {% endif %} {% endcomment %}
                                         </div>
-                                    {% endif %}
                                     </div>
                                 {% endif %}
                             {% endfor %}
@@ -190,15 +210,6 @@
                         <div class="flex justify-between items-start relative md:mb-4 mb-3">
                             <div class="flex-1">
                                 <h2 class="text-xl font-bold"> Photos </h2>
-                                <nav class="responsive-nav style-2 md:m-0 -mx-4">
-                                    <ul>
-                                        <li class="active"><a href="#">  Photos of you  <span> 230</span> </a></li>
-                                        <li><a href="#"> Recently added </a></li>
-                                        <li><a href="#"> Family </a></li>
-                                        <li><a href="#"> University </a></li>
-                                        <li><a href="#"> Albums </a></li>
-                                    </ul>
-                                </nav>
                             </div>
                             <a href="#offcanvas-create" uk-toggle class="flex items-center justify-center z-10 h-10 w-10 rounded-full bg-blue-600 text-white absolute right-0" data-tippy-placement="left" title="Create New Album">
                                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
@@ -206,13 +217,15 @@
                         </div>
 
                         <div class="grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-3 mt-5">
+                        {% for post in posts %}
+                            {% if post.image %}
                             <div>
                                 <div class="bg-green-400 max-w-full lg:h-44 h-36 rounded-lg relative overflow-hidden shadow uk-transition-toggle">
-                                    <img src="{% static 'assets/images/post/img-1.jpg' %}" class="w-full h-full absolute object-cover inset-0">
+                                    <img src="{{ post.image.url }}" class="w-full h-full absolute object-cover inset-0">
                                     <!-- overly-->
                                     <div class="-bottom-12 absolute bg-gradient-to-b from-transparent h-1/2 to-gray-800 uk-transition-slide-bottom-small w-full"></div>
                                     <div class="absolute bottom-0 w-full p-3 text-white uk-transition-slide-bottom-small">
-                                        <div class="text-base"> Image description </div>
+                                        <div class="text-base"> {{ post.title }} </div>
                                         <div class="flex justify-between text-xs">
                                             <a href="#">  Like</a>
                                             <a href="#">  Comment </a>
@@ -221,12 +234,10 @@
                                     </div>
                                 </div>
                             </div>
+                            {% endif %}
+                        {% endfor %}
                         </div>
 
-                        <div class="flex justify-center mt-6">
-                            <a href="#" class="bg-white dark:bg-gray-900 font-semibold my-3 px-6 py-2 rounded-full shadow-md dark:bg-gray-800 dark:text-white">
-                                Load more ..</a>
-                        </div>
 
                     </div>
 
