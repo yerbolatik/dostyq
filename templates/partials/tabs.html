@@ -2,7 +2,7 @@
     <ul uk-switcher="connect: #timeline-tab; animation: uk-animation-fade">
         <li>Timeline</a></li>
         <li class="{% if request.path == '/user/profile/<username>/' or request.path == '/user/my-profile/friends-tab/' %}uk-active{% endif %}">Friends <span>{{ profile.friends.all.count }}</span> </a></li>
-        <li><a href="#">Photoes </a></li>
+        <li><a href="#">Photos </a></li>
         <li><a href="#">Pages</a></li>
         <li><a href="#">Groups</a></li>
         <li><a href="#">Videos</a></li>
