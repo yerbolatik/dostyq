@@ -647,6 +647,11 @@ $(document).ready(function() {
         })
     })
 
+    // Tabs
+    function showFriends() {
+        // Активируйте вкладку друзей
+        UIkit.switcher('#timeline-tab').show(1);
+    }
 
 
 })

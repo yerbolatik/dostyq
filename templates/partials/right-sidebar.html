@@ -20,13 +20,7 @@
                 Friends with<strong>{{ profile.friends.count}} People </strong>
             </li>
         </ul>
-        <div class="gap-3 grid grid-cols-3 mt-4">
-            {% comment %} <img src="{% static 'assets/images/avatars/avatar-lg-2.jpg' %}" alt="" class="object-cover rounded-lg col-span-full">
-            <img src="{% static 'assets/images/avatars/avatar-2.jpg' %}" alt="" class="rounded-lg">
-            <img src="{% static 'assets/images/avatars/avatar-4.jpg' %}" alt="" class="rounded-lg">
-            <img src="{% static 'assets/images/avatars/avatar-5.jpg' %}" alt="" class="rounded-lg"> {% endcomment %}
-        </div>
-        <a href="#" class="button gray mt-3 w-full"> Edit </a>
+        <a href="{% url "userauths:profile-update" %}" class="button gray mt-3 w-full"> Edit </a>
     </div>
 
     <div class="widget card p-5 border-t">
@@ -35,7 +29,7 @@
                 <h4 class="text-lg font-semibold"> Friends </h4>
                 <p class="text-sm"> {{ profile.friends.all.count }} Friends</p>
             </div>
-            <a href="#" class="text-blue-600 ">See all</a>
+            <a href="#" class="text-blue-600" onclick="showFriends()" uk-switcher-item="1">See all</a>
         </div>
         <div class="grid grid-cols-3 gap-3 text-gray-600 font-semibold">
             {% for friend in profile.friends.all %}
@@ -48,7 +42,7 @@
             {% endfor %}
             
         </div>
-        <a href="#" class="button gray mt-3 w-full">  See all </a>
+        <a href="#" class="button gray mt-3 w-full" onclick="showFriends()" uk-switcher-item="1">  See all </a>
     </div>
 
     <!-- Groups List-->
@@ -57,22 +51,26 @@
             <div>
                 <h4 class="text-lg font-semibold"> Groups </h4>
             </div>
-            <a href="#" class="text-blue-600 "> See all</a>
+            <a href="{% url "core:groups" %}" class="text-blue-600 "> See all</a>
         </div>
         <div>
 
-            <div class="flex items-center space-x-4 rounded-md -mx-2 p-2 hover:bg-gray-50">
-                <a href="timeline-group.html" class="w-12 h-12 flex-shrink-0 overflow-hidden rounded-full relative">
-                  {% comment %} <img src="{% static 'assets/images/group/group-3.jpg' %}" class="absolute w-full h-full inset-0 " alt=""> {% endcomment %}
-              </a>
-                <div class="flex-1">
-                    <a href="timeline-page.html" class="text-base font-semibold capitalize"> Graphic Design  </a>
-                    <div class="text-sm text-gray-500 mt-0.5"> 345K Following</div>
-                </div>
-                <a href="timeline-page.html" class="flex items-center justify-center h-8 px-3 rounded-md text-sm border font-semibold bg-blue-500 text-white">
-                  Join
-              </a>
-            </div>
+            {% for group in groups %}
+                {% if request.user in group.members.all %}
+                    <div class="flex items-center space-x-4 rounded-md -mx-2 p-2 hover:bg-gray-50">
+                        <a href="timeline-group.html" class="w-12 h-12 flex-shrink-0 overflow-hidden rounded-full relative">
+                            <img src="{{ group.image.url }}" class="absolute w-full h-full inset-0 " alt="">
+                        </a>
+                        <div class="flex-1">
+                            <a href="timeline-page.html" class="text-base font-semibold capitalize"> {{ group.name }}  </a>
+                            <div class="text-sm text-gray-500 mt-0.5"> {{ group.members.all.count }} Followers</div>
+                        </div>
+                        <a href="{% url "core:group-index" group.slug %}" class="flex items-center justify-center h-8 px-3 rounded-md text-sm border font-semibold bg-blue-500 text-white">
+                            View
+                        </a>
+                    </div>
+                {% endif %}
+            {% endfor %}
             
 
         </div>
