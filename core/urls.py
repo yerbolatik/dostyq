@@ -21,6 +21,7 @@ urlpatterns = [
 
     # Group Chat
     path("core/group-inbox/", views.group_inbox, name="group_inbox"),
+    path("core/create-groupchat/", views.create_groupchat, name="create-groupchat"),
     path("core/group-inbox/<slug:slug>/",
          views.group_inbox_detail, name="group_inbox_detail"),
 

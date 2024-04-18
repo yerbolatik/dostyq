@@ -123,25 +123,15 @@
                                         <div> Anyone can see who's in the group and what they post. </div>
                                     </div>
                                 </div>
-                                <div class="flex items-center space-x-3">
-                                    <ion-icon name="unlink" class="bg-gray-100 p-1.5 rounded-full text-xl"></ion-icon>
-                                    <div class="flex-1">
-                                        <div>  <a href="#" class="text-blue-500"> https://mydomain.com </a> </div> 
+                                {% if group.website %}
+                                    <div class="flex items-center space-x-3">
+                                        <ion-icon name="unlink" class="bg-gray-100 p-1.5 rounded-full text-xl"></ion-icon>
+                                        <div class="flex-1">
+                                            <div>  <a href="{{group.website}}" class="text-blue-500" target="_blank"> {{ group.website }} </a> </div> 
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="flex items-center space-x-3">
-                                    <ion-icon name="mail-open" class="bg-gray-100 p-1.5 rounded-full text-xl"></ion-icon>
-                                    <div class="flex-1">
-                                        <div>  <a href="#" class="text-blue-500">myname@mywebssite.com</a> </div> 
-                                    </div>
-                                </div>
-                                <div class="flex items-center space-x-3">
-                                    <ion-icon name="albums" class="bg-gray-100 p-1.5 rounded-full text-xl"></ion-icon>
-                                    <div class="flex-1">
-                                        <div>  <a href="#" class="text-blue-500">Product/service</a> </div> 
-                                    </div>
-                                </div>
-                                 
+                                {% endif %}
+
                             </div>
                             
                         </div>

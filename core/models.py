@@ -233,6 +233,7 @@ class Group(models.Model):
     description = models.TextField(blank=True, null=True)
     video = models.FileField(
         upload_to=user_directory_path, null=True, blank=True)
+    website = models.CharField(max_length=500, blank=True, null=True)
     visibility = models.CharField(
         max_length=10, default="everyone", choices=VISIBILITY)
     gid = ShortUUIDField(length=7, max_length=25,

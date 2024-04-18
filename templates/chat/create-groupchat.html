@@ -33,21 +33,17 @@
 
                     <!-- form body -->
                     {{form.errors}}
-                    <form method="POST" action="{% url 'core:create-group' %}" enctype="multipart/form-data">
+                    <form method="POST" action="{% url 'core:create-groupchat' %}" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="p-10 space-y-7">
                             <div class="line">
-                                <input class="line__input" id="group-caption" name="group-caption" type="text" onkeyup="this.setAttribute('value', this.value);" value="" autocomplete="off">
-                                <span for="username" class="line__placeholder"> Group Name </span>
+                                <input class="line__input" id="groupchat-caption" name="groupchat-caption" type="text" onkeyup="this.setAttribute('value', this.value);" value="" autocomplete="off">
+                                <span for="username" class="line__placeholder"> Groupchat Name </span>
                             </div>
                             
                             <div class="line h-32"> 
-                                <textarea class="line__input h-32"  id="group-description" name="group-description" type="text" onkeyup="this.setAttribute('value', this.value);" value="" autocomplete="off"></textarea>
-                                <span for="username" class="line__placeholder"> Group description </span> 
-                            </div>
-                            <div class="line">
-                                <input class="line__input" id="group-website" name="group-website" type="text" onkeyup="this.setAttribute('value', this.value);" value="" autocomplete="off">
-                                <span for="username" class="line__placeholder"> Website </span> 
+                                <textarea class="line__input h-32"  id="groupchat-description" name="groupchat-description" type="text" onkeyup="this.setAttribute('value', this.value);" value="" autocomplete="off"></textarea>
+                                <span for="username" class="line__placeholder"> Groupchat description </span> 
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -55,13 +51,13 @@
                                 <div class="bg-gray-100 p-4  flex items-center" style="border-radius: 10px;">
                                     <div class="relative">
                                         <img src="{% static 'assets/images/group/noimage.gif' %}" id="preview_avatar" alt="Group Image" class="w-24 h-24 rounded-full">
-                                        <label for="group-thumbnail" class="absolute bottom-0 right-0 p-2 bg-white rounded-full cursor-pointer">
+                                        <label for="groupchat-thumbnail" class="absolute bottom-0 right-0 p-2 bg-white rounded-full cursor-pointer">
                                             <i class="fas fa-pen text-blue-500"></i>
                                         </label>
                                     </div>
                                 </div>
 
-                                <input type="file" name="group-thumbnail" id="group-thumbnail" onchange="loadFile(event)" style="display: none;">
+                                <input type="file" name="groupchat-thumbnail" id="groupchat-thumbnail" onchange="loadFile(event)" style="display: none;">
                                 <script>
                                     var loadFile = function (event) {
                                       var output2 = document.getElementById("preview_avatar");
@@ -72,18 +68,6 @@
                                     };
                                 </script>
                             </div>
-
-                            
-
-                            <div class="px-2 space-y-2">
-                                <label for="group-visibility" class="font-semibold text-base"> Choose Privacy </label> 
-                                <div> Anyone can see who's in the group and what they post. </div>
-                                <select class="selectpicker mt-2 story" id="group-visibility" name="group-visibility">
-                                    <option value="Everyone">Everyone</option>
-                                    <option value="Only me">Only me</option>
-                                </select>
-                            </div>
-                            
                         </div>
                         
                         <!-- form footer -->

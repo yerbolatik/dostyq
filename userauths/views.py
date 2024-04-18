@@ -138,6 +138,10 @@ def friend_profile(request, username):
     if request.user.profile == profile:
         return redirect("userauths:my-profile")
 
+    user = profile.user
+    friend_groups = Group.objects.filter(members=user)
+    unique_groups = set(friend_groups)
+
     posts = Post.objects.filter(active=True, user=profile.user).order_by("-id")
 
     bool = False
@@ -161,6 +165,7 @@ def friend_profile(request, username):
         "posts": posts,
         "bool": bool,
         "bool_friend": bool_friend,
+        "groups": unique_groups,
     }
     return render(request, "userauths/friend-profile.html", context)
 

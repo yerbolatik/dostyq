@@ -245,34 +245,32 @@
                         <div class="flex justify-between items-start relative md:mb-4 mb-3">
                             <div class="flex-1">
                                 <h2 class="text-xl font-bold"> Groups </h2>
-                                <nav class="responsive-nav style-2 md:m-0 -mx-4">
-                                    <ul>
-                                        <li class="active"><a href="#"> Joined <span> 230</span> </a></li>
-                                    </ul>
-                                </nav>
                             </div>
                         </div>
 
-                        <div class="uk-switcher grid md:grid-cols-2  grid-cols-2 gap-x-2 gap-y-4 mt-3">
-                            
-                            {% for group in groups %}
-                                <div class="flex items-center flex-col md:flex-row justify-center p-4 rounded-md shadow hover:shadow-md md:space-x-4">
-                                    <a href="timeline-group.html" iv="" class="w-16 h-16 flex-shrink-0 overflow-hidden rounded-full relative">
-                                        <img src="{% static 'assets/images/group/group-3.jpg' %}" class="absolute w-full h-full inset-0 " alt="">
-                                    </a>
-                                    <div class="flex-1">
-                                        <a href="timeline-page.html" class="text-base font-semibold capitalize">Graphic Design </a>
-                                        <div class="text-sm text-gray-500"> 54 mutual friends </div>
-                                    </div>
-                                    <button class="bg-gray-100 font-semibold py-2 px-3 rounded-md text-sm md:mt-0 mt-3">
-                                        Following
-                                    </button>
+                         <div class="lg:mt-8 mt-4" id="groups-tab">
+                            <!--Joined-->
+                                <div class="grid md:grid-cols-2  grid-cols-2 gap-x-2 gap-y-4 mt-3">
+                                    {% for group in groups %}
+                                        {% if profile.user in group.members.all and group.visibility == "Everyone" %}
+                                            <div class="flex items-center flex-col md:flex-row justify-center p-4 rounded-md shadow hover:shadow-md md:space-x-4">
+                                                <a href="{% url "core:group-index" group.slug%}" iv="" class="w-16 h-16 flex-shrink-0 overflow-hidden rounded-full relative">
+                                                    <img src="{{ group.image.url }}" class="absolute w-full h-full inset-0 " alt="">
+                                                </a>
+                                                <div class="flex-1">
+                                                    <a href="{% url "core:group-index" group.slug%}" class="text-base font-semibold capitalize">{{ group.name }} </a>
+                                                    <div class="text-sm text-gray-500"> {{ group.members.all.count }} Members </div>
+                                                </div>
+                                                <a href="{% url "core:group-index" group.slug%}" class="bg-gray-200 bg-gray-100 font-semibold py-2 px-3 rounded-md text-sm md:mt-0 mt-3">
+                                                    View  
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
                                 </div>
-                            {% endfor %}
 
 
 
-                        </div>
                     </div>
 
                 </div>

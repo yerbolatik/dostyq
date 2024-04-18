@@ -56,7 +56,8 @@
         <div>
 
             {% for group in groups %}
-                {% if request.user in group.members.all %}
+                {% if profile.user in group.members.all and group.visibility == "Everyone" %}
+
                     <div class="flex items-center space-x-4 rounded-md -mx-2 p-2 hover:bg-gray-50">
                         <a href="timeline-group.html" class="w-12 h-12 flex-shrink-0 overflow-hidden rounded-full relative">
                             <img src="{{ group.image.url }}" class="absolute w-full h-full inset-0 " alt="">

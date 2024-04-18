@@ -11,7 +11,7 @@ from django.utils.timesince import timesince
 from django.views.decorators.csrf import csrf_exempt
 from itertools import chain
 
-from core.forms import GroupForm
+from core.forms import GroupChatForm, GroupForm
 from core.models import GroupPost, Post, Comment, ReplyComment, Friend, FriendRequest, Notification, ChatMessage, GroupChatMessage, GroupChat, Group
 from userauths.models import User, Profile
 
@@ -139,7 +139,7 @@ def groups(request):
 
     context = {
         "groups": unique_groups,
-        "max_members": max_members
+        "max_members": max_members,
     }
     return render(request, 'core/groups.html', context)
 
@@ -151,8 +151,10 @@ def create_group(request):
         if form.is_valid():
             name = request.POST.get("group-caption")
             description = request.POST.get("group-description")
-            image = request.FILES.get("group-thumbnail")
+            image = request.FILES.get(
+                "group-thumbnail", default='noimage.gif')
             visibility = request.POST.get("group-visibility")
+            website = request.POST.get("group-website")
 
             uuid_key = shortuuid.uuid()
             uniqueid = uuid_key[:4]
@@ -162,6 +164,7 @@ def create_group(request):
                 user=request.user,
                 name=name,
                 description=description,
+                website=website,
                 image=image,
                 slug=slug,
                 visibility=visibility
@@ -177,7 +180,7 @@ def create_group(request):
 def group_index(request, slug):
     group = Group.objects.get(slug=slug, active=True)
     group_posts = GroupPost.objects.filter(
-        active=True, visibility="Everyone").order_by("-id")
+        group=group, active=True, visibility="Everyone").order_by("-id")
     paginator = Paginator(group_posts, 3)
     page_number = request.GET.get('page')
     group_posts = paginator.get_page(page_number)
@@ -624,6 +627,36 @@ def inbox_detail(request, username):
         "message_detail": message_detail,
     }
     return render(request, "chat/inbox_detail.html", context)
+
+
+@login_required
+def create_groupchat(request):
+    if request.method == 'POST':
+        form = GroupChatForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            name = request.POST.get("groupchat-caption")
+            description = request.POST.get("groupchat-description")
+            image = request.FILES.get(
+                "groupchat-thumbnail", default='noimage.gif')
+
+            uuid_key = shortuuid.uuid()
+            uniqueid = uuid_key[:4]
+            slug = slugify(name) + '-' + str(uniqueid.lower())
+
+            groupchat = GroupChat(
+                name=name,
+                description=description,
+                images=image,
+                slug=slug,
+                host=request.user,
+                members=request.user
+            )
+            groupchat.save()
+            return redirect('core:groupchat_inbox')
+    else:
+        form = GroupChatForm()
+    return render(request, 'chat/create-groupchat.html', {'form': form})
 
 
 @login_required
