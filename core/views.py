@@ -34,8 +34,26 @@ def index(request):
     paginator = Paginator(posts, 3)
     page_number = request.GET.get('page')
     posts = paginator.get_page(page_number)
+
+    user = request.user
+    user_groups = Group.objects.filter(members=user)
+
+    if user_groups.exists():
+        only_me_groups = user_groups.filter(visibility="Only me")
+        everyone_groups = user_groups.filter(visibility="Everyone")
+        all_everyone_groups = Group.objects.filter(
+            active=True, visibility="Everyone")
+        groups = list(
+            chain(only_me_groups, everyone_groups, all_everyone_groups))
+    else:
+        groups = Group.objects.filter(
+            active=True, visibility="Everyone").order_by("-id")
+
+    unique_groups = set(groups)
+
     context = {
-        "posts": posts
+        "posts": posts,
+        "groups": unique_groups
     }
     return render(request, 'core/index.html', context)
 
@@ -179,12 +197,30 @@ def create_group(request):
 
 def group_index(request, slug):
     group = Group.objects.get(slug=slug, active=True)
+    user = request.user
+    user_groups = Group.objects.filter(members=user)
     group_posts = GroupPost.objects.filter(
         group=group, active=True, visibility="Everyone").order_by("-id")
     paginator = Paginator(group_posts, 3)
     page_number = request.GET.get('page')
     group_posts = paginator.get_page(page_number)
+
+    if user_groups.exists():
+        only_me_groups = user_groups.filter(visibility="Only me")
+        everyone_groups = user_groups.filter(visibility="Everyone")
+        all_everyone_groups = Group.objects.filter(
+            active=True, visibility="Everyone")
+        groups = list(
+            chain(only_me_groups, everyone_groups, all_everyone_groups))
+    else:
+        groups = Group.objects.filter(
+            active=True, visibility="Everyone").order_by("-id")
+
+    unique_groups = set(groups)
+
     context = {
+
+        "groups": unique_groups,
         "group": group,
         "group_posts": group_posts
     }
@@ -789,10 +825,11 @@ def load_more_posts(request):
 
 
 def photos(request):
+    user = request.user
     photos = Post.objects.filter(
-        active=True, visibility="Everyone").order_by("-id")
+        active=True, visibility="Everyone", user=user).order_by("-id")
     posts = Post.objects.filter(
-        active=True, visibility="Everyone").order_by("-id")
+        active=True, visibility="Everyone", user=user).order_by("-id")
 
     context = {
         "photos": photos,

@@ -20,7 +20,10 @@
                 Friends with<strong>{{ profile.friends.count}} People </strong>
             </li>
         </ul>
+
+        {% if request.user == profile.user %}
         <a href="{% url "userauths:profile-update" %}" class="button gray mt-3 w-full"> Edit </a>
+        {% endif %}
     </div>
 
     <div class="widget card p-5 border-t">
