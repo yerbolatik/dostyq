@@ -95,7 +95,7 @@
                                                 for (const user of data.users) {
                                                     const listItem = $('<li></li>');
 
-                                                    const link = $('<a></a>').attr('href', '/user/profile/'+user.username + '/');
+                                                    const link = $('<a></a>').attr('href', '/user/profile/'+user.username);
                                                     listItem.append(link);
 
                                                     if (user.profile_image) {
@@ -420,10 +420,6 @@
                                 <img src="{{friend.profile.image.url}}" alt="">
                             </div>
                             <div class="contact-username">  {{friend.profile.full_name}}</div>
-                            <p>
-                                <ion-icon name="people" class="text-lg mr-1"></ion-icon> Become friends with
-                                <strong> Stella Johnson </strong> and <strong> 14 Others</strong>
-                            </p>
                             <div class="contact-list-box-btns">
                                 <a href="{% url 'core:inbox_detail' friend.username %}" class="button primary flex-1 block mr-2"> <i class="uil-envelope mr-1"></i> Send message</a>
                                 <button type="button" href="#" class="button secondary button-icon mr-2"><i class="uil-list-ul"> </i> </button>
@@ -502,7 +498,6 @@
         {% block content %}
         
         {% endblock  %}
-
 
         <script>
             {% for message in messages %}

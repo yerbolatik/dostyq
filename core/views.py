@@ -1,5 +1,7 @@
 from django.urls import reverse
 import shortuuid
+import markdown
+
 
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -12,7 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from itertools import chain
 
 from core.forms import GroupChatForm, GroupForm
-from core.models import GroupPost, Post, Comment, ReplyComment, Friend, FriendRequest, Notification, ChatMessage, GroupChatMessage, GroupChat, Group
+from core.models import GroupPost, GroupPostComment, Post, Comment, ReplyComment, Friend, FriendRequest, Notification, ChatMessage, GroupChatMessage, GroupChat, Group, ReplyGroupPostComment
 from userauths.models import User, Profile
 
 
@@ -38,6 +40,9 @@ def index(request):
     user = request.user
     user_groups = Group.objects.filter(members=user)
 
+    groupchat = GroupChat.objects.filter(
+        members=user, active=True)
+
     if user_groups.exists():
         only_me_groups = user_groups.filter(visibility="Only me")
         everyone_groups = user_groups.filter(visibility="Everyone")
@@ -53,7 +58,8 @@ def index(request):
 
     context = {
         "posts": posts,
-        "groups": unique_groups
+        "groups": unique_groups,
+        "groupchat": groupchat
     }
     return render(request, 'core/index.html', context)
 
@@ -61,8 +67,29 @@ def index(request):
 @login_required
 def post_detail(request, slug):
     post = Post.objects.get(slug=slug, active=True, visibility="Everyone")
+    user = request.user
+    user_groups = Group.objects.filter(members=user)
+
+    groupchat = GroupChat.objects.filter(
+        members=user, active=True)
+
+    if user_groups.exists():
+        only_me_groups = user_groups.filter(visibility="Only me")
+        everyone_groups = user_groups.filter(visibility="Everyone")
+        all_everyone_groups = Group.objects.filter(
+            active=True, visibility="Everyone")
+        groups = list(
+            chain(only_me_groups, everyone_groups, all_everyone_groups))
+    else:
+        groups = Group.objects.filter(
+            active=True, visibility="Everyone").order_by("-id")
+
+    unique_groups = set(groups)
+
     context = {
-        "post": post
+        "post": post,
+        "groups": unique_groups,
+        "groupchat": groupchat,
     }
     return render(request, 'core/post_detail.html', context)
 
@@ -75,291 +102,29 @@ def create_post(request):
         visibility = request.POST.get("visibility")
         image = request.FILES.get("post-thumbnail")
 
-        uuid_key = shortuuid.uuid()
-        uniqueid = uuid_key[:4]
-
-        if title and image:
-            post = Post(
-                title=title,
-                visibility=visibility,
-                image=image,
-                user=request.user,
-                slug=slugify(title) + '-' + str(uniqueid.lower())
-            )
-            post.save()
-
-            return JsonResponse({"post": {
-                "title": post.title,
-                "image": post.image.url,
-                "full_name": post.user.profile.full_name,
-                "profile_image": post.user.profile.image.url,
-                "date": timesince(post.date),
-                "id": post.id,
-            }})
-
-        elif title:
-            post = Post(
-                title=title,
-                visibility=visibility,
-                user=request.user,
-                slug=slugify(title) + '-' + str(uniqueid.lower())
-            )
-            post.save()
-
-            return JsonResponse({"post": {
-                "title": post.title,
-                "full_name": post.user.profile.full_name,
-                "profile_image": post.user.profile.image.url,
-                "date": timesince(post.date),
-                "id": post.id,
-            }})
-
-        elif image:
-            post = Post(
-                visibility=visibility,
-                image=image,
-                user=request.user,
-                slug=slugify(title) + '-' + str(uniqueid.lower())
-            )
-            post.save()
-
-            return JsonResponse({"post": {
-                "image": post.image.url,
-                "full_name": post.user.profile.full_name,
-                "profile_image": post.user.profile.image.url,
-                "date": timesince(post.date),
-                "id": post.id,
-            }})
-
-    return JsonResponse({"data": "sent"})
-
-
-# Group Functions
-def groups(request):
-    user = request.user
-    user_groups = Group.objects.filter(members=user)
-
-    if user_groups.exists():
-        only_me_groups = user_groups.filter(visibility="Only me")
-        everyone_groups = user_groups.filter(visibility="Everyone")
-        all_everyone_groups = Group.objects.filter(
-            active=True, visibility="Everyone")
-        groups = list(
-            chain(only_me_groups, everyone_groups, all_everyone_groups))
-    else:
-        groups = Group.objects.filter(
-            active=True, visibility="Everyone").order_by("-id")
-
-    unique_groups = set(groups)
-
-    max_members = max(unique_groups, key=lambda group: group.members.all(
-    ).count()).members.all().count() if unique_groups else 0
-
-    context = {
-        "groups": unique_groups,
-        "max_members": max_members,
-    }
-    return render(request, 'core/groups.html', context)
-
-
-def create_group(request):
-    if request.method == 'POST':
-        form = GroupForm(request.POST, request.FILES)
-
-        if form.is_valid():
-            name = request.POST.get("group-caption")
-            description = request.POST.get("group-description")
-            image = request.FILES.get(
-                "group-thumbnail", default='noimage.gif')
-            visibility = request.POST.get("group-visibility")
-            website = request.POST.get("group-website")
-
+        if title or image:
             uuid_key = shortuuid.uuid()
             uniqueid = uuid_key[:4]
-            slug = slugify(name) + '-' + str(uniqueid.lower())
 
-            group = Group(
-                user=request.user,
-                name=name,
-                description=description,
-                website=website,
-                image=image,
-                slug=slug,
-                visibility=visibility
-            )
-            group.save()
-            group.members.add(request.user)
-            return redirect('core:group-index', slug=group.slug)
-    else:
-        form = GroupForm()
-    return render(request, 'core/create-group.html', {'form': form})
-
-
-def group_index(request, slug):
-    group = Group.objects.get(slug=slug, active=True)
-    user = request.user
-    user_groups = Group.objects.filter(members=user)
-    group_posts = GroupPost.objects.filter(
-        group=group, active=True, visibility="Everyone").order_by("-id")
-    paginator = Paginator(group_posts, 3)
-    page_number = request.GET.get('page')
-    group_posts = paginator.get_page(page_number)
-
-    if user_groups.exists():
-        only_me_groups = user_groups.filter(visibility="Only me")
-        everyone_groups = user_groups.filter(visibility="Everyone")
-        all_everyone_groups = Group.objects.filter(
-            active=True, visibility="Everyone")
-        groups = list(
-            chain(only_me_groups, everyone_groups, all_everyone_groups))
-    else:
-        groups = Group.objects.filter(
-            active=True, visibility="Everyone").order_by("-id")
-
-    unique_groups = set(groups)
-
-    context = {
-
-        "groups": unique_groups,
-        "group": group,
-        "group_posts": group_posts
-    }
-    return render(request, 'core/group-index.html', context)
-
-
-@csrf_exempt
-def create_group_post(request):
-    if request.method == "POST":
-        group_id = request.POST.get("group_id")
-        title = request.POST.get("group-post-caption")
-        visibility = request.POST.get("group-post-visibility")
-        image = request.FILES.get("group-post-thumbnail")
-
-        uuid_key = shortuuid.uuid()
-        uniqueid = uuid_key[:4]
-
-        group = Group.objects.get(id=group_id)
-
-        if title and image:
-            group_post = GroupPost(
-                group=group,
+            post = Post(
                 title=title,
                 visibility=visibility,
                 image=image,
                 user=request.user,
-                slug=slugify(title) + '-' + str(uniqueid.lower())
+                slug=slugify(title)[:25] + '-' + str(uniqueid.lower())
             )
-            group_post.save()
+            post.save()
 
             return JsonResponse({"post": {
-                "title": group_post.title,
-                "image": group_post.image.url,
-                "full_name": group_post.user.profile.full_name,
-                "profile_image": group_post.user.profile.image.url,
-                "date": timesince(group_post.date),
-                "id": group_post.id,
-            }})
-
-        elif title:
-            group_post = GroupPost(
-                title=title,
-                visibility=visibility,
-                user=request.user,
-                slug=slugify(title) + '-' + str(uniqueid.lower())
-            )
-            group_post.save()
-
-            return JsonResponse({"post": {
-                "title": group_post.title,
-                "full_name": group_post.user.profile.full_name,
-                "profile_image": group_post.user.profile.image.url,
-                "date": timesince(group_post.date),
-                "id": group_post.id,
-            }})
-
-        elif image:
-            group_post = GroupPost(
-                visibility=visibility,
-                image=image,
-                user=request.user,
-                slug=slugify(title) + '-' + str(uniqueid.lower())
-            )
-            group_post.save()
-
-            return JsonResponse({"post": {
-                "image": group_post.image.url,
-                "full_name": group_post.user.profile.full_name,
-                "profile_image": group_post.user.profile.image.url,
-                "date": timesince(group_post.date),
-                "id": group_post.id,
-            }})
-
+                "title": post.title,
+                "image": post.image.url if post.image else None,
+                "full_name": post.user.profile.full_name,
+                "profile_image": post.user.profile.image.url,
+                "date": timesince(post.date),
+                "id": post.id,
+            }
+            })
     return JsonResponse({"data": "sent"})
-
-
-@csrf_exempt
-def join_group(request, slug):
-    group = Group.objects.get(slug=slug, active=True, visibility="Everyone")
-    member = request.user
-
-    if request.method == "POST":
-        group.members.add(member)
-        return HttpResponseRedirect(reverse('core:group-index', args=[slug]))
-
-    context = {
-        "group": group
-    }
-    return render(request, 'core/group-index.html', context)
-
-
-@csrf_exempt
-def unfollow_group(request, slug):
-    group = Group.objects.get(slug=slug, active=True)
-    member = request.user
-
-    if request.method == "POST":
-        group.members.remove(member)
-        return JsonResponse({"success": True})
-
-    context = {
-        "group": group
-    }
-    return render(request, 'core/groups.html', context)
-
-
-def send_notification(user, sender, post, comment, notification_type):
-    notification = Notification.objects.create(
-        user=user,
-        sender=sender,
-        post=post,
-        comment=comment,
-        notification_type=notification_type,
-    )
-    return notification
-
-
-def update_notification_status(request):
-    id = request.GET['id']
-    notification = Notification.objects.get(id=id)
-
-    notification.is_read = True
-    notification.save()
-
-    data = {
-        "bool": notification.is_read,
-    }
-    return JsonResponse({"data": data})
-
-
-def mark_as_read_all(request):
-    if request.method == "POST":
-        user = request.user
-        notifications = Notification.objects.filter(user=user, is_read=False)
-        notifications.update(is_read=True)
-
-        return JsonResponse({"success": "All notifications marked as read."})
-    else:
-        return JsonResponse({"error": "Invalid request method."})
 
 
 def like_post(request):
@@ -489,6 +254,360 @@ def delete_reply(request):
     return JsonResponse({"data": data})
 
 
+def delete_post(request):
+    id = request.GET['id']
+    post = Post.objects.get(id=id)
+    post.delete()
+
+    data = {
+        "bool": True
+    }
+    return JsonResponse({"data": data})
+
+
+# Group Functions
+def groups(request):
+    user = request.user
+    user_groups = Group.objects.filter(members=user)
+
+    groupchat = GroupChat.objects.filter(
+        members=user, active=True)
+
+    if user_groups.exists():
+        only_me_groups = user_groups.filter(visibility="Only me")
+        everyone_groups = user_groups.filter(visibility="Everyone")
+        all_everyone_groups = Group.objects.filter(
+            active=True, visibility="Everyone")
+        groups = list(
+            chain(only_me_groups, everyone_groups, all_everyone_groups))
+    else:
+        groups = Group.objects.filter(
+            active=True, visibility="Everyone").order_by("-id")
+
+    unique_groups = set(groups)
+
+    max_members = max(unique_groups, key=lambda group: group.members.all(
+    ).count()).members.all().count() if unique_groups else 0
+
+    context = {
+        "groups": unique_groups,
+        "max_members": max_members,
+        "groupchat": groupchat,
+    }
+    return render(request, 'core/groups.html', context)
+
+
+def create_group(request):
+    if request.method == 'POST':
+        form = GroupForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            name = request.POST.get("group-caption")
+            description = request.POST.get("group-description")
+            image = request.FILES.get(
+                "group-thumbnail", default='noimage.gif')
+            visibility = request.POST.get("group-visibility")
+            website = request.POST.get("group-website")
+
+            uuid_key = shortuuid.uuid()
+            uniqueid = uuid_key[:4]
+            slug = slugify(name) + '-' + str(uniqueid.lower())
+
+            group = Group(
+                user=request.user,
+                name=name,
+                description=description,
+                website=website,
+                image=image,
+                slug=slug,
+                visibility=visibility
+            )
+            group.save()
+            group.members.add(request.user)
+            return redirect('core:group-index', slug=group.slug)
+    else:
+        form = GroupForm()
+
+    groupchat = GroupChat.objects.filter(
+        members=request.user, active=True)
+
+    return render(request, 'core/create-group.html', {'form': form, "groupchat": groupchat})
+
+
+def group_index(request, slug):
+    group = Group.objects.get(slug=slug, active=True)
+    user = request.user
+    user_groups = Group.objects.filter(members=user)
+    posts = GroupPost.objects.filter(
+        group=group, active=True, visibility="Everyone").order_by("-id")
+    paginator = Paginator(posts, 3)
+    page_number = request.GET.get('page')
+    posts = paginator.get_page(page_number)
+
+    groupchat = GroupChat.objects.filter(
+        members=request.user, active=True)
+
+    if user_groups.exists():
+        only_me_groups = user_groups.filter(visibility="Only me")
+        everyone_groups = user_groups.filter(visibility="Everyone")
+        all_everyone_groups = Group.objects.filter(
+            active=True, visibility="Everyone")
+        groups = list(
+            chain(only_me_groups, everyone_groups, all_everyone_groups))
+    else:
+        groups = Group.objects.filter(
+            active=True, visibility="Everyone").order_by("-id")
+
+    unique_groups = set(groups)
+
+    context = {
+
+        "groups": unique_groups,
+        "group": group,
+        "posts": posts,
+        "groupchat": groupchat,
+    }
+    return render(request, 'core/group-index.html', context)
+
+
+@csrf_exempt
+def create_group_post(request):
+    if request.method == "POST":
+        group_id = request.POST.get("group_id")
+        title = request.POST.get("group-post-caption")
+        visibility = request.POST.get("group-post-visibility")
+        image = request.FILES.get("group-post-thumbnail")
+
+        uuid_key = shortuuid.uuid()
+        uniqueid = uuid_key[:4]
+
+        group = Group.objects.get(id=group_id)
+
+        if title or image:
+            group_post = GroupPost(
+                group=group,
+                title=title,
+                visibility=visibility,
+                image=image,
+                user=request.user,
+                slug=slugify(title)[:25] + '-' + str(uniqueid.lower())
+            )
+            group_post.save()
+
+            return JsonResponse({"post": {
+                "title": group_post.title,
+                "image": group_post.image.url,
+                "full_name": group_post.user.profile.full_name,
+                "profile_image": group_post.user.profile.image.url,
+                "date": timesince(group_post.date),
+                "id": group_post.id,
+            }})
+    return JsonResponse({"data": "sent"})
+
+
+def like_group_post(request):
+    id = request.GET['id']
+    post = GroupPost.objects.get(id=id)
+    user = request.user
+    bool = False
+
+    if user in post.likes.all():
+        post.likes.remove(user)
+        bool = False
+    else:
+        post.likes.add(user)
+        bool = True
+
+        if post.user != request.user:
+            send_notification(post.user, user, post, None, noti_new_like)
+
+    data = {
+        "bool": bool,
+        "likes": post.likes.all().count()
+    }
+    return JsonResponse({"data": data})
+
+
+def comment_on_group_post(request):
+    id = request.GET['id']
+    comment = request.GET['comment']
+    post = GroupPost.objects.get(id=id)
+    comment_count = GroupPostComment.objects.filter(post=post).count()
+    user = request.user
+
+    new_comment = GroupPostComment.objects.create(
+        post=post,
+        comment=comment,
+        user=user,
+    )
+
+    if new_comment.user != post.user:
+        send_notification(post.user, user, post, new_comment, noti_new_comment)
+
+    data = {
+        "bool": True,
+        "comment": new_comment.comment,
+        "profile_image": new_comment.user.profile.image.url,
+        "date": timesince(new_comment.date),
+        "comment_id": new_comment.id,
+        "post_id": new_comment.post.id,
+        "comment_count": comment_count + int(1),
+    }
+
+    return JsonResponse({"data": data})
+
+
+def like_group_post_comment(request):
+    id = request.GET['id']
+    comment = GroupPostComment.objects.get(id=id)
+    user = request.user
+    bool = False
+
+    if user in comment.likes.all():
+        comment.likes.remove(user)
+        bool = False
+    else:
+        comment.likes.add(user)
+        bool = True
+
+        if comment.user != user:
+            send_notification(comment.user, user, comment.post,
+                              comment, noti_comment_liked)
+
+    data = {
+        "bool": bool,
+        "likes": comment.likes.all().count()
+    }
+    return JsonResponse({"data": data})
+
+
+def reply_group_post_comment(request):
+    id = request.GET['id']
+    reply = request.GET['reply']
+
+    comment = GroupPostComment.objects.get(id=id)
+    user = request.user
+
+    new_reply = ReplyGroupPostComment.objects.create(
+        reply=reply,
+        comment=comment,
+        user=user,
+    )
+
+    data = {
+        "bool": True,
+        "reply": new_reply.reply,
+        "profile_image": new_reply.user.profile.image.url,
+        "date": timesince(new_reply.date),
+        "reply_id": new_reply.id,
+        "post_id": new_reply.comment.post.id,
+    }
+
+    if comment.user != user:
+        send_notification(comment.user, user, comment.post,
+                          comment, noti_comment_replied)
+
+    return JsonResponse({"data": data})
+
+
+def delete_group_post_comment(request):
+    id = request.GET['id']
+    comment = GroupPostComment.objects.get(id=id)
+    comment.delete()
+
+    data = {
+        "bool": True
+    }
+    return JsonResponse({"data": data})
+
+
+def delete_group_post_reply(request):
+    id = request.GET['id']
+    reply = ReplyGroupPostComment.objects.get(id=id)
+    reply.delete()
+
+    data = {
+        "bool": True
+    }
+    return JsonResponse({"data": data})
+
+
+def delete_group_post(request):
+    id = request.GET['id']
+    post = GroupPost.objects.get(id=id)
+    post.delete()
+
+    data = {
+        "bool": True
+    }
+    return JsonResponse({"data": data})
+
+
+@csrf_exempt
+def join_group(request, slug):
+    group = Group.objects.get(slug=slug, active=True, visibility="Everyone")
+    member = request.user
+
+    if request.method == "POST":
+        group.members.add(member)
+        return HttpResponseRedirect(reverse('core:group-index', args=[slug]))
+
+    context = {
+        "group": group
+    }
+    return render(request, 'core/group-index.html', context)
+
+
+@csrf_exempt
+def unfollow_group(request, slug):
+    group = Group.objects.get(slug=slug, active=True)
+    member = request.user
+
+    if request.method == "POST":
+        group.members.remove(member)
+        return JsonResponse({"success": True})
+
+    context = {
+        "group": group
+    }
+    return render(request, 'core/groups.html', context)
+
+
+def send_notification(user, sender, post, comment, notification_type):
+    notification = Notification.objects.create(
+        user=user,
+        sender=sender,
+        post=post,
+        comment=comment,
+        notification_type=notification_type,
+    )
+    return notification
+
+
+def update_notification_status(request):
+    id = request.GET['id']
+    notification = Notification.objects.get(id=id)
+
+    notification.is_read = True
+    notification.save()
+
+    data = {
+        "bool": notification.is_read,
+    }
+    return JsonResponse({"data": data})
+
+
+def mark_as_read_all(request):
+    if request.method == "POST":
+        user = request.user
+        notifications = Notification.objects.filter(user=user, is_read=False)
+        notifications.update(is_read=True)
+
+        return JsonResponse({"success": "All notifications marked as read."})
+    else:
+        return JsonResponse({"error": "Invalid request method."})
+
+
 # Friends actions
 def add_friend(request):
     sender = request.user
@@ -614,8 +733,12 @@ def inbox(request):
         )
     ).order_by("-id")
 
+    groupchat = GroupChat.objects.filter(
+        members=request.user, active=True)
+
     context = {
         "chat_message": chat_message,
+        "groupchat": groupchat,
     }
     return render(request, "chat/inbox.html", context)
 
@@ -668,31 +791,37 @@ def inbox_detail(request, username):
 @login_required
 def create_groupchat(request):
     if request.method == 'POST':
-        form = GroupChatForm(request.POST, request.FILES)
+        name = request.POST.get("groupchat-caption")
+        description = request.POST.get("groupchat-description")
+        image = request.FILES.get("groupchat-thumbnail", 'noimage.gif')
 
-        if form.is_valid():
-            name = request.POST.get("groupchat-caption")
-            description = request.POST.get("groupchat-description")
-            image = request.FILES.get(
-                "groupchat-thumbnail", default='noimage.gif')
+        # Генерируем уникальный slug
+        uuid_key = shortuuid.uuid()
+        uniqueid = uuid_key[:4]
+        slug = slugify(name) + '-' + str(uniqueid.lower())
 
-            uuid_key = shortuuid.uuid()
-            uniqueid = uuid_key[:4]
-            slug = slugify(name) + '-' + str(uniqueid.lower())
+        # Создаем объект GroupChat и сохраняем его
+        groupchat = GroupChat(
+            name=name,
+            description=description,
+            images=image,
+            slug=slug,
+            host=request.user,
+        )
+        groupchat.save()
 
-            groupchat = GroupChat(
-                name=name,
-                description=description,
-                images=image,
-                slug=slug,
-                host=request.user,
-                members=request.user
-            )
-            groupchat.save()
-            return redirect('core:groupchat_inbox')
+        groupchat.members.add(request.user)
+
+        return redirect('core:group_inbox')
     else:
-        form = GroupChatForm()
-    return render(request, 'chat/create-groupchat.html', {'form': form})
+
+        groupchat = GroupChat.objects.filter(
+            members=request.user, active=True)
+
+        context = {
+            "groupchat": groupchat,
+        }
+        return render(request, 'chat/create-groupchat.html', context)
 
 
 @login_required
@@ -784,7 +913,13 @@ def search_users(request):
 
 
 def games(request):
-    return render(request, 'games/all_games.html')
+    groupchat = GroupChat.objects.filter(
+        members=request.user, active=True)
+
+    context = {
+        "groupchat": groupchat,
+    }
+    return render(request, 'games/all_games.html', context)
 
 
 def stack_brick(request):

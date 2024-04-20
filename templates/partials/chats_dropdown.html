@@ -66,7 +66,7 @@
         <nav class="responsive-nav border-b extanded mb-2 -mt-2">
             <ul uk-switcher="connect: #chats-tab; animation: uk-animation-fade">
                 <li class="uk-active"><a class="active" href="#0"> Friends </a></li>
-                <li><a href="#0">Groups <span> 10 </span> </a></li>
+                <li><a href="#0">Group Chats </a></li>
             </ul>
         </nav>
 
@@ -86,19 +86,14 @@
 
             </div>
             <div class="p-1">
-                <a href="chats-group.html">
+                {% for message in groupchat %}
+                <a href="{% url 'core:group_inbox_detail' message.slug %}">
                     <div class="contact-avatar">
-                        <img src="{% static 'assets/images/avatars/avatar-7.jpg' %}" alt="">
+                        <img src="{{message.images.url}}" alt="">
                     </div>
-                    <div class="contact-username"> Alex Dolgove</div>
+                    <div class="contact-username"> {{message.name}}</div>
                 </a>
-                <a href="chats-group.html">
-                    <div class="contact-avatar">
-                        <img src="{% static 'assets/images/avatars/avatar-8.jpg' %}" alt="">
-                        <span class="user_status status_online"></span>
-                    </div>
-                    <div class="contact-username"> Dennis Han</div>
-                </a>
+                {% endfor %}
             </div>
 
         </div>

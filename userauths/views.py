@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 
-from core.models import Group, Post, FriendRequest
+from core.models import Group, GroupChat, Post, FriendRequest
 from userauths.forms import UserRegisterForm, ProfileUpdateForm, UserUpdateForm
 from userauths.models import Profile, User
 
@@ -77,10 +77,14 @@ def my_profile(request):
     groups = Group.objects.filter(
         active=True).order_by("-id")
 
+    groupchat = GroupChat.objects.filter(
+        members=request.user, active=True)
+
     context = {
         "profile": profile,
         "posts": posts,
         "groups": groups,
+        "groupchat": groupchat,
     }
     return render(request, "userauths/my-profile.html", context)
 
@@ -142,6 +146,9 @@ def friend_profile(request, username):
     friend_groups = Group.objects.filter(members=user)
     unique_groups = set(friend_groups)
 
+    groupchat = GroupChat.objects.filter(
+        members=request.user, active=True)
+
     posts = Post.objects.filter(active=True, user=profile.user).order_by("-id")
 
     bool = False
@@ -166,6 +173,7 @@ def friend_profile(request, username):
         "bool": bool,
         "bool_friend": bool_friend,
         "groups": unique_groups,
+        "groupchat": groupchat,
     }
     return render(request, "userauths/friend-profile.html", context)
 
