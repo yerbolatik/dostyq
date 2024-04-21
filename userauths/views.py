@@ -20,6 +20,7 @@ def RegisterView(request):
         form.save()
         full_name = form.cleaned_data.get("full_name")
         phone = form.cleaned_data.get("phone")
+        gender = form.cleaned_data.get("gender")
         email = form.cleaned_data.get("email")
         password = form.cleaned_data.get("password1")
 
@@ -29,6 +30,7 @@ def RegisterView(request):
         profile = Profile.objects.get(user=request.user)
         profile.full_name = full_name
         profile.phone = phone
+        profile.gender = gender
         profile.save()
 
         messages.success(
@@ -197,15 +199,3 @@ def friends_tab(request):
     else:
         # Вернуться на главную страницу, если текущий URL не содержит информацию о профиле пользователя или друга
         return redirect("core:feed")
-
-
-def photos_tab(request):
-    pass
-
-
-def pages_tab(request):
-    pass
-
-
-def groups_tab(request):
-    pass

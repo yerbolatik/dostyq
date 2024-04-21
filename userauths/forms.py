@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.forms import ImageField, FileInput, TextInput, Select
+from django.contrib.auth.forms import PasswordResetForm
+from django.forms import ImageField, FileInput
 
 from userauths.models import User, Profile
 
@@ -59,3 +60,8 @@ class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['email']
+
+
+class CustomPasswordResetForm(PasswordResetForm):
+    email = forms.EmailField(max_length=254, label='Email', widget=forms.EmailInput(
+        attrs={'autocomplete': 'email'}))

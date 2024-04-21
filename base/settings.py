@@ -91,6 +91,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'base.wsgi.application'
 
+PASSWORD_RESET_EMAIL_TEMPLATE = 'userauths/password-reset/password-reset-email.html'
+
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -155,6 +157,14 @@ AUTH_USER_MODEL = "userauths.User"
 LOGIN_REDIRECT_URL = "core:feed"
 LOGOUT_REDIRECT_URL = "userauths:sign-up"
 LOGIN_URL = "userauths:sign-up"
+
+
+# EMAIL_BACKEND
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'yerbolat.assabay@gmail.com'
+EMAIL_HOST_PASSWORD = 'jaun ctwe vfrt bess'
+EMAIL_USE_SSL = True
 
 # Jazzmin
 

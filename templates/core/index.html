@@ -38,6 +38,7 @@
                 <div class="lg:w-72 w-full">
 
                     <!--Birthday-->
+                    {% if request.user.profile.friends >= 1%}
                     <a href="#birthdays" uk-toggle>
                         <div class="bg-white mb-5 px-4 py-3 rounded-md shadow">
                             <h3 class="text-line-through font-semibold mb-1"> Birthdays </h3>
@@ -48,6 +49,7 @@
                             </div>
                         </div>
                     </a>
+                    {% endif %}
                     <!--Birthday end-->
 
                     <h3 class="text-xl font-semibold"> Contacts </h3>
@@ -141,6 +143,7 @@
                 <div class="text-xl font-semibold"> Today's birthdays </div>
             </div>
 
+            {% if request.user.profile.friends >= 1%}
             <div class="space-y-6">
                 <div class="sm:space-y-8 space-y-6 pb-2">
 
@@ -154,9 +157,8 @@
                         </div>
                     </div>
                 </div>
-
-
                 </div>
+            {% endif %}
             </div>
 
         </div>

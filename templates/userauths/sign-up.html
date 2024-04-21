@@ -8,14 +8,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Favicon -->
-    <link href="assets/images/favicon.png" rel="icon" type="image/png">
+    <link href="{% static 'assets/images/favicon.png' %}" rel="icon" type="image/png">
 
     <!-- Basic Page Needs
         ================================================== -->
-    <title>Socialite Template</title>
+    <title>Dostyq</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Socialite is - Professional A unique and beautiful collection of UI elements">
+    <meta name="description" content="Dostyq social media">
 
     <!-- icons
     ================================================== -->
@@ -80,7 +80,8 @@
                     <button type="submit" class="bg-blue-600 font-semibold p-3 rounded-md text-center text-white w-full">
                         Log In
                     </button>
-                    <a href="#" class="text-blue-500 text-center block"> Forgot Password? </a>
+                    
+                    <a href="{% url 'reset_password' %}" class="text-blue-500 text-center block"> Forgot Password? </a>
                     <hr class="pb-3.5">
                     <div class="flex">
                         <a href="#register" type="button" class="bg-green-600 hover:bg-green-500 hover:text-white font-semibold py-3 px-5 rounded-md text-center text-white mx-auto" uk-toggle>
@@ -89,7 +90,6 @@
                     </div>
                 </form>
 
-                <div class="mt-8 text-center text-sm"> <a href="#" class="font-semibold hover:underline"> Create a Page </a> for a celebrity, band or business </div>
             </div>
 
         </div>
